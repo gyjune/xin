@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数字时钟与日期</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+        
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            color: #fff;
+            transition: background 0.5s ease;
+        }
+        
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .container {
+            background: rgba(0, 0, 0, 0.7);
+            padding: 30px 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            backdrop-filter: blur(10px);
+            max-width: 90%;
+            width: 500px;
+        }
+        
+        .time {
+            font-size: 6rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+        }
+        
+        .date {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+            opacity: 0.9;
+        }
+        
+        .day {
+            font-size: 1.5rem;
+            opacity: 0.8;
+            margin-bottom: 20px;
+        }
+        
+        .theme-switch {
+            margin-top: 20px;
+        }
+        
+        .switch-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 30px;
+            color: white;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .switch-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        .light-mode {
+            background: linear-gradient(135deg, #74ebd5, #acb6e5);
+            color: #333;
+        }
+        
+        .light-mode .container {
+            background: rgba(255, 255, 255, 0.8);
+            color: #333;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        @media (max-width: 600px) {
+            .time {
+                font-size: 4rem;
+            }
+            
+            .date {
+                font-size: 1.5rem;
+            }
+            
+            .day {
+                font-size: 1.2rem;
+            }
+            
+            .container {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="time" id="time">00:00:00</div>
+        <div class="date" id="date">2023年11月11日</div>
+        <div class="day" id="day">星期六</div>
+        <div class="theme-switch">
+            <button class="switch-btn" id="themeBtn">切换浅色模式</button>
+        </div>
+    </div>
+
+    <script>
+        // 获取DOM元素
+        const timeElement = document.getElementById('time');
+        const dateElement = document.getElementById('date');
+        const dayElement = document.getElementById('day');
+        const themeBtn = document.getElementById('themeBtn');
+        const body = document.body;
+        
+        // 星期几的中文表示
+        const days = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
+        
+        // 更新时间的函数
+        function updateTime() {
+            const now = new Date();
+            
+            // 格式化时间
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            
+            // 更新DOM元素
+            timeElement.textContent = `${hours}:${minutes}:${seconds}`;
+            
+            // 每秒钟更新一次
+            setTimeout(updateTime, 1000);
+        }
+        
+        // 更新日期和星期的函数
+        function updateDate() {
+            const now = new Date();
+            
+            // 格式化日期
+            const year = now.getFullYear();
+            const month = now.getMonth() + 1;
+            const day = now.getDate();
+            
+            // 更新DOM元素
+            dateElement.textContent = `${year}年${month}月${day}日`;
+            dayElement.textContent = days[now.getDay()];
+        }
+        
+        // 切换主题
+        themeBtn.addEventListener('click', () => {
+            body.classList.toggle('light-mode');
+            themeBtn.textContent = body.classList.contains('light-mode') 
+                ? '切换深色模式' 
+                : '切换浅色模式';
+        });
+        
+        // 初始化
+        updateTime();
+        updateDate();
+        
+        // 每天更新一次日期
+        setInterval(updateDate, 86400000);
+    </script>
+</body>
+</html>
