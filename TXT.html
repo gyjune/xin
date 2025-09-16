@@ -1,0 +1,535 @@
+<html lang="zh-CN"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" id="mixia_vpid">
+    <title>TXT与M3U播放列表转换工具</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(90deg, #3498db, #2980b9);
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+        }
+        
+        .description {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .main-content {
+            display: flex;
+            flex-wrap: wrap;
+            padding: 20px;
+            gap: 20px;
+        }
+        
+        .input-section, .output-section {
+            flex: 1;
+            min-width: 300px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #3498db;
+            color: #2980b9;
+        }
+        
+        .section-title i {
+            font-size: 1.3rem;
+        }
+        
+        textarea {
+            width: 100%;
+            height: 300px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 14px;
+            resize: vertical;
+            margin-bottom: 15px;
+        }
+        
+        .buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+        
+        button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 6px;
+            background: #3498db;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        button:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        button.convert {
+            background: #27ae60;
+        }
+        
+        button.convert:hover {
+            background: #219653;
+        }
+        
+        button.reset {
+            background: #e74c3c;
+        }
+        
+        button.reset:hover {
+            background: #c0392b;
+        }
+        
+        .file-upload {
+            margin-bottom: 20px;
+        }
+        
+        .file-upload-label {
+            display: block;
+            padding: 15px;
+            border: 2px dashed #3498db;
+            border-radius: 6px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #e8f4fc;
+        }
+        
+        .file-upload-label:hover {
+            background: #d1e9f9;
+            border-color: #2980b9;
+        }
+        
+        .file-upload-label i {
+            font-size: 2rem;
+            color: #3498db;
+            margin-bottom: 10px;
+        }
+        
+        .file-upload-label span {
+            display: block;
+            font-weight: 600;
+            color: #2980b9;
+        }
+        
+        .file-upload-label small {
+            color: #7f8c8d;
+        }
+        
+        input[type="file"] {
+            display: none;
+        }
+        
+        .instructions {
+            background: #fff8e1;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 20px;
+            border-radius: 6px;
+        }
+        
+        .instructions h3 {
+            color: #e65100;
+            margin-bottom: 10px;
+        }
+        
+        .instructions ul {
+            padding-left: 20px;
+        }
+        
+        .instructions li {
+            margin-bottom: 8px;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: #7f8c8d;
+            font-size: 0.9rem;
+            border-top: 1px solid #eee;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            background: #4caf50;
+            color: white;
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .notification.error {
+            background: #e74c3c;
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                flex-direction: column;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            .notification {
+                top: 10px;
+                right: 10px;
+                left: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-exchange-alt"></i> TXT与M3U播放列表转换工具</h1>
+            <p class="description">在TXT和M3U格式之间轻松转换播放列表，支持文件上传</p>
+        </header>
+        
+        <div class="instructions">
+            <h3><i class="fas fa-info-circle"></i> 使用说明</h3>
+            <ul>
+                <li>在左侧输入TXT或M3U格式的播放列表内容，或直接上传文件</li>
+                <li>点击"转换为M3U"或"转换为TXT"按钮进行格式转换</li>
+                <li>转换后的内容将显示在右侧</li>
+                <li>使用"清除内容"按钮重置输入和输出</li>
+          </ul>
+        </div>
+        
+        <div class="main-content">
+            <div class="input-section">
+                <div class="section-title">
+                    <i class="fas fa-pen"></i>
+                    <h2>输入内容</h2>
+                </div>
+                
+                <div class="file-upload">
+                    <label for="fileInput" class="file-upload-label">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <span>点击上传文件</span>
+                        <small>支持TXT或M3U格式</small>
+                    </label>
+                    <input type="file" id="fileInput" accept=".txt,.m3u">
+                </div>
+                
+                <textarea id="inputText" placeholder="请输入TXT或M3U格式的播放列表..."></textarea>
+                
+                <div class="buttons">
+                    <button class="convert" onclick="convertToM3U()">
+                        <i class="fas fa-arrow-right"></i>转换为M3U
+                    </button>
+                    <button class="convert" onclick="convertToTxt()">
+                        <i class="fas fa-arrow-right"></i>转换为TXT
+                    </button>
+                    <button class="reset" onclick="clearAll()">
+                        <i class="fas fa-trash"></i>清除内容
+                    </button>
+                </div>
+            </div>
+            
+            <div class="output-section">
+                <div class="section-title">
+                    <i class="fas fa-file-alt"></i>
+                    <h2>输出内容</h2>
+                </div>
+                <textarea id="outputText" readonly="" placeholder="转换结果将显示在这里..."></textarea>
+                
+                <div class="buttons">
+                    <button onclick="downloadOutput()">
+                        <i class="fas fa-download"></i>下载文件
+                    </button>
+                    <button onclick="copyToClipboard()">
+                        <i class="fas fa-copy"></i>复制到剪贴板
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>© 2023 TXT与M3U转换工具</p>
+        </footer>
+    </div>
+
+    <div class="notification" id="notification">内容已复制到剪贴板！</div>
+
+    <script>
+        // 文件上传处理
+        document.getElementById('fileInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('inputText').value = e.target.result;
+                showNotification('文件内容已加载');
+            };
+            reader.readAsText(file);
+        });
+        
+        // 转换为M3U格式
+        function convertToM3U() {
+            const input = document.getElementById('inputText').value.trim();
+            
+            if (!input) {
+                showNotification('请输入要转换的内容', true);
+                return;
+            }
+            
+            // 检查是否已经是M3U格式
+            if (input.startsWith('#EXTM3U')) {
+                document.getElementById('outputText').value = "内容已经是M3U格式";
+                showNotification('内容已经是M3U格式，无需转换', true);
+                return;
+            }
+            
+            // EPG信息
+            const epgInfo = `#EXTM3U x-tvg-url="https://live.fanmingming.cn/e.xml"\n`;
+            
+            let output = epgInfo;
+            const lines = input.split('\n');
+            let currentGroup = "";
+            let validLines = 0;
+            let hasGroupInfo = false;
+            
+            // 首先检查是否有分组信息
+            for (let i = 0; i < lines.length; i++) {
+                if (lines[i].includes('#genre#')) {
+                    hasGroupInfo = true;
+                    break;
+                }
+            }
+            
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i].trim();
+                if (!line) continue;
+                
+                // 检查是否为分组行 (包含 #genre#)
+                if (line.includes('#genre#')) {
+                    const parts = line.split(',');
+                    if (parts.length >= 1) {
+                        currentGroup = parts[0].trim();
+                    }
+                    continue;
+                }
+                
+                // 处理频道行
+                const parts = line.split(',');
+                if (parts.length >= 2) {
+                    const name = parts[0].trim();
+                    const url = parts[1].trim();
+                    
+                    // 处理频道名称中的特殊字符
+                    const processedName = name.replace(/(CCTV|CETV)-\d+.*/, '$12');
+                    
+                    // 如果没有分组信息，group-title设为空
+                    const groupTitle = hasGroupInfo ? currentGroup : "";
+                    
+                    output += `#EXTINF:-1 tvg-id="${i+1}" tvg-name="${processedName}" tvg-logo="https://live.fanmingming.cn/tv/${processedName}.png" group-title="${groupTitle}",${name}\n`;
+                    output += `${url}\n`;
+                    validLines++;
+                }
+            }
+            
+            if (validLines > 0) {
+                document.getElementById('outputText').value = output;
+                showNotification(`成功转换 ${validLines} 个频道到M3U格式`);
+            } else {
+                document.getElementById('outputText').value = "未找到有效的频道数据";
+                showNotification('未找到有效的频道数据，请检查输入格式', true);
+            }
+        }
+        
+        // 转换为TXT格式
+        function convertToTxt() {
+            const input = document.getElementById('inputText').value.trim();
+            
+            if (!input) {
+                showNotification('请输入要转换的内容', true);
+                return;
+            }
+            
+            // 检查是否已经是TXT格式
+            if (!input.startsWith('#EXTM3U')) {
+                document.getElementById('outputText').value = "内容已经是TXT格式";
+                showNotification('内容已经是TXT格式，无需转换', true);
+                return;
+            }
+            
+            let output = "";
+            const lines = input.split('\n');
+            let currentName = "";
+            let currentGroup = "";
+            let validLines = 0;
+            let lastGroup = "";
+            
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i].trim();
+                if (!line) continue;
+                
+                if (line.startsWith('#EXTINF:')) {
+                    // 提取频道名称和分组信息
+                    const nameMatch = line.match(/,(.+)$/);
+                    if (nameMatch) {
+                        currentName = nameMatch[1];
+                    }
+                    
+                    const groupMatch = line.match(/group-title="([^"]+)"/);
+                    if (groupMatch) {
+                        currentGroup = groupMatch[1];
+                    } else {
+                        currentGroup = "";
+                    }
+                    
+                    // 如果分组改变且不为空，添加分组行
+                    if (currentGroup &amp;&amp; currentGroup !== lastGroup) {
+                        output += `${currentGroup},#genre#\n`;
+                        lastGroup = currentGroup;
+                    }
+                } else if (line &amp;&amp; !line.startsWith('#') &amp;&amp; currentName) {
+                    // 这是URL行
+                    output += `${currentName},${line}\n`;
+                    currentName = "";
+                    validLines++;
+                }
+            }
+            
+            if (validLines > 0) {
+                document.getElementById('outputText').value = output;
+                showNotification(`成功转换 ${validLines} 个频道到TXT格式`);
+            } else {
+                document.getElementById('outputText').value = "未找到有效的频道数据";
+                showNotification('未找到有效的频道数据，请检查输入格式', true);
+            }
+        }
+        
+        // 清除所有内容
+        function clearAll() {
+            document.getElementById('inputText').value = '';
+            document.getElementById('outputText').value = '';
+            document.getElementById('fileInput').value = '';
+            showNotification('内容已清除');
+        }
+        
+        // 复制到剪贴板
+        function copyToClipboard() {
+            const outputText = document.getElementById('outputText');
+            const content = outputText.value.trim();
+            
+            if (!content) {
+                showNotification('没有内容可复制', true);
+                return;
+            }
+            
+            outputText.select();
+            document.execCommand('copy');
+            showNotification('内容已复制到剪贴板！');
+        }
+        
+        // 下载输出文件
+        function downloadOutput() {
+            const output = document.getElementById('outputText').value;
+            if (!output.trim()) {
+                showNotification('没有内容可下载！', true);
+                return;
+            }
+            
+            const blob = new Blob([output], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            
+            // 根据内容判断文件类型
+            if (output.startsWith('#EXTM3U')) {
+                a.download = 'playlist.m3u';
+            } else {
+                a.download = 'playlist.txt';
+            }
+            
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showNotification('文件下载成功！');
+        }
+        
+        // 显示通知
+        function showNotification(message, isError = false) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            
+            if (isError) {
+                notification.classList.add('error');
+            } else {
+                notification.classList.remove('error');
+            }
+            
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+    </script>
+
+</body></html>
