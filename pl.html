@@ -1,0 +1,703 @@
+<html><head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1" id="mixia_vpid">
+    <title>在线网址链接批量生成器 - 完整版</title>
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2c3e50;
+            --accent-color: #e74c3c;
+            --light-bg: #f8f9fa;
+            --border-color: #dee2e6;
+        }
+        
+        body {
+            background-color: #f5f7f9;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #333;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            padding: 25px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        h1 {
+            color: var(--secondary-color);
+            margin-bottom: 10px;
+        }
+        
+        .description {
+            color: #666;
+            font-size: 16px;
+        }
+        
+        .card {
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+            border: 1px solid var(--border-color);
+        }
+        
+        .card-header {
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 8px 8px 0 0;
+            padding: 12px 20px;
+            font-weight: 600;
+        }
+        
+        .card-body {
+            padding: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+            position: relative;
+        }
+        
+        label {
+            font-weight: 500;
+            color: var(--secondary-color);
+            display: block;
+            margin-bottom: 5px;
+        }
+        
+        input[type="text"],
+        input[type="number"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+        }
+        
+        .checkbox-group input {
+            margin-right: 8px;
+        }
+        
+        .btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            font-size: 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            display: inline-block;
+            text-align: center;
+            transition: background-color 0.3s;
+        }
+        
+        .btn:hover {
+            background-color: #2980b9;
+        }
+        
+        .btn-block {
+            display: block;
+            width: 100%;
+        }
+        
+        .result-area {
+            min-height: 200px;
+            font-family: monospace;
+            line-height: 1.6;
+            resize: vertical;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .btn-secondary {
+            background-color: #6c757d;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+        
+        .btn-success {
+            background-color: #28a745;
+        }
+        
+        .btn-success:hover {
+            background-color: #218838;
+        }
+        
+        .btn-clear {
+            background-color: var(--accent-color);
+            padding: 10px 15px;
+            font-size: 14px;
+        }
+        
+        .btn-clear:hover {
+            background-color: #c0392b;
+        }
+        
+        .radio-group {
+            margin: 15px 0;
+        }
+        
+        .radio-group input {
+            margin-right: 8px;
+        }
+        
+        .radio-group label {
+            display: inline;
+            font-weight: normal;
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .gen-type {
+            display: none;
+        }
+        
+        .gen-type.active {
+            display: block;
+        }
+        
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .container {
+                padding: 15px;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+            
+            .action-buttons .btn {
+                width: 100%;
+            }
+        }
+        
+        .instruction {
+            background-color: #e8f4fc;
+            border-left: 4px solid var(--primary-color);
+            padding: 15px;
+            border-radius: 4px;
+            margin: 20px 0;
+            font-size: 14px;
+        }
+        
+        code {
+            background-color: #f1f1f1;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-family: monospace;
+        }
+        
+        .file-options {
+            background-color: #f8f9fa;
+            border-radius: 4px;
+            padding: 15px;
+            margin-top: 15px;
+            border: 1px dashed #dee2e6;
+        }
+        
+        .save-notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #28a745;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 4px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+            display: none;
+            z-index: 1000;
+        }
+        
+        .type-selector {
+            display: flex;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 15px;
+        }
+        
+        .type-btn {
+            padding: 10px 20px;
+            cursor: pointer;
+            background: none;
+            border: none;
+            font-weight: 500;
+            color: #666;
+            border-bottom: 3px solid transparent;
+        }
+        
+        .type-btn.active {
+            color: var(--primary-color);
+            border-bottom: 3px solid var(--primary-color);
+        }
+        
+        .input-with-button {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .input-with-button input {
+            flex: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>在线网址链接批量生成器</h1>
+            <p class="description">快速生成有规律的批量链接，支持多种生成规则和文件保存</p>
+        </div>
+        
+        <div class="instruction">
+            <p>在网址模板中使用 <code>(*)</code> 作为变量占位符，然后选择一种生成规则来批量创建链接。</p>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">网址模板设置</div>
+            <div class="card-body">
+                <div class="form-group">
+                    <label for="urlTemplate">网址模板</label>
+                    <div class="input-with-button">
+                        <input type="text" id="urlTemplate" value="http://www.example.com/(*).jpg" placeholder="例如: http://www.example.com/(*).jpg">
+                        <button class="btn btn-clear" id="clearTemplateBtn">清除</button>
+                    </div>
+                    <small>使用 (*) 作为变量占位符</small>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">生成选项</div>
+            <div class="card-body">
+                <div class="type-selector">
+                    <button class="type-btn active" data-type="arithmetic">等差数列</button>
+                    <button class="type-btn" data-type="geometric">等比数列</button>
+                    <button class="type-btn" data-type="letters">字母变化</button>
+                </div>
+                
+                <!-- 等差数列 -->
+                <div id="arithmetic-type" class="gen-type active">
+                    <div class="grid">
+                        <div class="form-group">
+                            <label for="startValue">首项</label>
+                            <input type="number" id="startValue" value="1" min="0">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="itemCount">项数</label>
+                            <input type="number" id="itemCount" value="5" min="1">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="stepValue">公差</label>
+                            <input type="number" id="stepValue" value="1">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="zeroPadding">位数补零</label>
+                            <select id="zeroPadding">
+                                <option value="0">不补零</option>
+                                <option value="2">2位 (01)</option>
+                                <option value="3">3位 (001)</option>
+                                <option value="4">4位 (0001)</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="reverseOrder">
+                        <label for="reverseOrder">倒序生成</label>
+                    </div>
+                </div>
+                
+                <!-- 等比数列 -->
+                <div id="geometric-type" class="gen-type">
+                    <div class="grid">
+                        <div class="form-group">
+                            <label for="geoStartValue">首项</label>
+                            <input type="number" id="geoStartValue" value="1" min="1">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="geoItemCount">项数</label>
+                            <input type="number" id="geoItemCount" value="5" min="1">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="geoRatio">公比</label>
+                            <input type="number" id="geoRatio" value="2" min="1">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="geoZeroPadding">位数补零</label>
+                            <select id="geoZeroPadding">
+                                <option value="0">不补零</option>
+                                <option value="2">2位 (01)</option>
+                                <option value="3">3位 (001)</option>
+                                <option value="4">4位 (0001)</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="geoReverseOrder">
+                        <label for="geoReverseOrder">倒序生成</label>
+                    </div>
+                </div>
+                
+                <!-- 字母变化 -->
+                <div id="letters-type" class="gen-type">
+                    <div class="grid">
+                        <div class="form-group">
+                            <label for="letterStart">起始字母</label>
+                            <input type="text" id="letterStart" value="a" maxlength="1">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="letterEnd">结束字母</label>
+                            <input type="text" id="letterEnd" value="z" maxlength="1">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="letterCase">字母大小写</label>
+                            <select id="letterCase">
+                                <option value="lower">小写字母</option>
+                                <option value="upper">大写字母</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="letterReverseOrder">
+                        <label for="letterReverseOrder">倒序生成</label>
+                    </div>
+                </div>
+                
+                <button class="btn btn-block" id="generateBtn">生成链接</button>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">生成结果</div>
+            <div class="card-body">
+                <textarea class="result-area" id="resultArea" readonly=""></textarea>
+                
+                <div class="file-options">
+                    <label for="fileName">文件名</label>
+                    <input type="text" id="fileName" value="生成的链接" placeholder="输入文件名">
+                    
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="addTimestamp" checked="">
+                        <label for="addTimestamp">添加时间戳</label>
+                    </div>
+                    
+                    <label for="fileFormat">文件格式</label>
+                    <select id="fileFormat">
+                        <option value="txt">文本文件 (.txt)</option>
+                        <option value="csv">CSV文件 (.csv)</option>
+                    </select>
+                </div>
+                
+                <div class="action-buttons">
+                    <button class="btn btn-secondary" id="copyBtn">复制结果</button>
+                    <button class="btn btn-success" id="saveBtn">保存文件</button>
+                    <button class="btn btn-secondary" id="clearBtn">清空结果</button>
+                </div>
+                
+                <div style="display: flex; justify-content: space-between; margin-top: 10px;">
+                    <small id="resultCount">0 条链接</small>
+                    <small id="resultLength">0 字符</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="save-notification" id="saveNotification">
+        文件已成功保存！
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlTemplate = document.getElementById('urlTemplate');
+            const clearTemplateBtn = document.getElementById('clearTemplateBtn');
+            const generateBtn = document.getElementById('generateBtn');
+            const resultArea = document.getElementById('resultArea');
+            const copyBtn = document.getElementById('copyBtn');
+            const saveBtn = document.getElementById('saveBtn');
+            const clearBtn = document.getElementById('clearBtn');
+            const resultCount = document.getElementById('resultCount');
+            const resultLength = document.getElementById('resultLength');
+            const fileName = document.getElementById('fileName');
+            const addTimestamp = document.getElementById('addTimestamp');
+            const fileFormat = document.getElementById('fileFormat');
+            const saveNotification = document.getElementById('saveNotification');
+            const typeButtons = document.querySelectorAll('.type-btn');
+            const genTypes = document.querySelectorAll('.gen-type');
+            
+            // 清除模板内容
+            clearTemplateBtn.addEventListener('click', function() {
+                urlTemplate.value = '';
+                urlTemplate.focus();
+            });
+            
+            // 切换生成类型
+            typeButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const type = this.getAttribute('data-type');
+                    
+                    // 更新按钮状态
+                    typeButtons.forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // 更新内容区域
+                    genTypes.forEach(gen => gen.classList.remove('active'));
+                    document.getElementById(`${type}-type`).classList.add('active');
+                });
+            });
+            
+            // 生成链接功能
+            generateBtn.addEventListener('click', function() {
+                const template = urlTemplate.value;
+                const activeType = document.querySelector('.type-btn.active').getAttribute('data-type');
+                
+                // 验证输入
+                if (!template.includes('(*)')) {
+                    alert('网址模板中必须包含 (*) 作为变量占位符');
+                    return;
+                }
+                
+                let results = [];
+                
+                if (activeType === 'arithmetic') {
+                    // 等差数列
+                    const start = parseInt(document.getElementById('startValue').value);
+                    const count = parseInt(document.getElementById('itemCount').value);
+                    const step = parseInt(document.getElementById('stepValue').value);
+                    const zeroPad = parseInt(document.getElementById('zeroPadding').value);
+                    const reverse = document.getElementById('reverseOrder').checked;
+                    
+                    if (isNaN(start) || isNaN(count) || isNaN(step) || count <= 0) {
+                        alert('请输入有效的数字');
+                        return;
+                    }
+                    
+                    for (let i = 0; i < count; i++) {
+                        let value = start + (i * step);
+                        let formattedValue = value.toString();
+                        
+                        // 补零处理
+                        if (zeroPad > 0 &amp;&amp; formattedValue.length < zeroPad) {
+                            formattedValue = formattedValue.padStart(zeroPad, '0');
+                        }
+                        
+                        // 替换模板中的占位符
+                        let url = template.replace('(*)', formattedValue);
+                        results.push(url);
+                    }
+                    
+                    // 倒序处理
+                    if (reverse) {
+                        results.reverse();
+                    }
+                } 
+                else if (activeType === 'geometric') {
+                    // 等比数列
+                    const start = parseInt(document.getElementById('geoStartValue').value);
+                    const count = parseInt(document.getElementById('geoItemCount').value);
+                    const ratio = parseInt(document.getElementById('geoRatio').value);
+                    const zeroPad = parseInt(document.getElementById('geoZeroPadding').value);
+                    const reverse = document.getElementById('geoReverseOrder').checked;
+                    
+                    if (isNaN(start) || isNaN(count) || isNaN(ratio) || count <= 0) {
+                        alert('请输入有效的数字');
+                        return;
+                    }
+                    
+                    for (let i = 0; i < count; i++) {
+                        let value = start * Math.pow(ratio, i);
+                        let formattedValue = value.toString();
+                        
+                        // 补零处理
+                        if (zeroPad > 0 &amp;&amp; formattedValue.length < zeroPad) {
+                            formattedValue = formattedValue.padStart(zeroPad, '0');
+                        }
+                        
+                        // 替换模板中的占位符
+                        let url = template.replace('(*)', formattedValue);
+                        results.push(url);
+                    }
+                    
+                    // 倒序处理
+                    if (reverse) {
+                        results.reverse();
+                    }
+                } 
+                else if (activeType === 'letters') {
+                    // 字母变化
+                    const startChar = document.getElementById('letterStart').value.toLowerCase();
+                    const endChar = document.getElementById('letterEnd').value.toLowerCase();
+                    const letterCase = document.getElementById('letterCase').value;
+                    const reverse = document.getElementById('letterReverseOrder').checked;
+                    
+                    if (!startChar.match(/[a-z]/i) || !endChar.match(/[a-z]/i)) {
+                        alert('请输入有效的字母');
+                        return;
+                    }
+                    
+                    const startCode = startChar.charCodeAt(0);
+                    const endCode = endChar.charCodeAt(0);
+                    
+                    if (startCode > endCode) {
+                        alert('起始字母不能大于结束字母');
+                        return;
+                    }
+                    
+                    for (let i = startCode; i <= endCode; i++) {
+                        let char = String.fromCharCode(i);
+                        
+                        // 大小写处理
+                        if (letterCase === 'upper') {
+                            char = char.toUpperCase();
+                        }
+                        
+                        // 替换模板中的占位符
+                        let url = template.replace('(*)', char);
+                        results.push(url);
+                    }
+                    
+                    // 倒序处理
+                    if (reverse) {
+                        results.reverse();
+                    }
+                }
+                
+                // 显示结果
+                resultArea.value = results.join('\n');
+                updateResultStats();
+            });
+            
+            // 更新结果统计
+            function updateResultStats() {
+                const lines = resultArea.value.split('\n').filter(line => line.trim() !== '');
+                resultCount.textContent = lines.length + ' 条链接';
+                resultLength.textContent = resultArea.value.length + ' 字符';
+            }
+            
+            // 复制功能
+            copyBtn.addEventListener('click', function() {
+                if (!resultArea.value) {
+                    alert('没有内容可复制');
+                    return;
+                }
+                
+                resultArea.select();
+                document.execCommand('copy');
+                
+                // 显示复制成功提示
+                const originalText = copyBtn.textContent;
+                copyBtn.textContent = '已复制!';
+                
+                setTimeout(() => {
+                    copyBtn.textContent = originalText;
+                }, 2000);
+            });
+            
+            // 保存功能
+            saveBtn.addEventListener('click', function() {
+                if (!resultArea.value) {
+                    alert('没有内容可保存');
+                    return;
+                }
+                
+                let name = fileName.value || '生成的链接';
+                
+                // 添加时间戳
+                if (addTimestamp.checked) {
+                    const now = new Date();
+                    const timestamp = `${now.getFullYear()}${(now.getMonth()+1).toString().padStart(2, '0')}${now.getDate().toString().padStart(2, '0')}_${now.getHours().toString().padStart(2, '0')}${now.getMinutes().toString().padStart(2, '0')}`;
+                    name += `_${timestamp}`;
+                }
+                
+                // 添加文件扩展名
+                const format = fileFormat.value;
+                name += format === 'csv' ? '.csv' : '.txt';
+                
+                // 创建文件内容
+                let content = resultArea.value;
+                if (format === 'csv') {
+                    // 转换为CSV格式
+                    const lines = content.split('\n');
+                    content = 'URL\n' + lines.join('\n');
+                }
+                
+                // 创建Blob对象
+                const blob = new Blob([content], { type: format === 'csv' ? 'text/csv' : 'text/plain' });
+                
+                // 创建下载链接
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = name;
+                a.style.display = 'none';
+                
+                // 添加到文档并触发点击
+                document.body.appendChild(a);
+                a.click();
+                
+                // 清理
+                setTimeout(() => {
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(a.href);
+                }, 100);
+                
+                // 显示保存成功通知
+                saveNotification.style.display = 'block';
+                setTimeout(() => {
+                    saveNotification.style.display = 'none';
+                }, 3000);
+            });
+            
+            // 清空功能
+            clearBtn.addEventListener('click', function() {
+                resultArea.value = '';
+                updateResultStats();
+            });
+            
+            // 初始化
+            updateResultStats();
+        });
+    </script>
+
+</body></html>
