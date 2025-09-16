@@ -7,7 +7,7 @@
         /* 全局样式 - 极简清爽风 */
         body {
             font-family: 'Microsoft YaHei', 'Roboto', sans-serif;
-            background-color: #f9fafb; /* 超浅灰底，更显通透 */
+            background-color: #f9fafb;
             margin: 0;
             padding: 0;
             color: #374151;
@@ -17,11 +17,11 @@
             line-height: 1.5;
         }
         
-        /* 导航栏 - 简化且突出交互 */
+        /* 导航栏样式 */
         nav {
             background-color: #4285f4;
             padding: 10px 0;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.08); /* 更淡阴影，减少压迫感 */
+            box-shadow: 0 1px 2px rgba(0,0,0,0.08);
         }
         
         nav ul {
@@ -31,7 +31,7 @@
             display: flex;
             justify-content: center;
             flex-wrap: wrap;
-            gap: 5px; /* 移动端适配间距 */
+            gap: 5px;
         }
         
         nav li {
@@ -44,16 +44,16 @@
             font-size: 15px;
             padding: 7px 12px;
             border-radius: 4px;
-            transition: all 0.2s ease; /* 更流畅过渡 */
-            display: inline-block; /* 确保点击区域完整 */
+            transition: all 0.2s ease;
+            display: inline-block;
         }
         
         nav a:hover, nav a:active {
             background-color: #3367d6;
-            transform: translateY(-1px); /* 轻微上浮，增强交互感 */
+            transform: translateY(-1px);
         }
         
-        /* 内容容器 - 留白优化 */
+        /* 内容容器 */
         .container {
             max-width: 1000px;
             margin: 20px auto;
@@ -81,7 +81,7 @@
             margin-bottom: 15px;
         }
         
-        /* 主页时钟日历 - 轻量化布局 */
+        /* 主页时钟日历 */
         .clock-calendar {
             display: flex;
             flex-wrap: wrap;
@@ -97,7 +97,7 @@
             box-shadow: 0 0 4px rgba(0,0,0,0.02);
             min-width: 260px;
             text-align: center;
-            border: 1px solid #f3f4f6; /* 细边框增强层次感 */
+            border: 1px solid #f3f4f6;
         }
         
         #clock {
@@ -155,14 +155,14 @@
             font-weight: 500;
         }
         
-        /* 页面切换 - 基础样式保留 */
+        /* 页面切换 */
         .page {
             display: none;
         }
         
         .active {
             display: block;
-            animation: fadeIn 0.3s ease; /* 淡入动画，增强切换体验 */
+            animation: fadeIn 0.3s ease;
         }
         
         @keyframes fadeIn {
@@ -170,7 +170,7 @@
             to { opacity: 1; }
         }
         
-        /* 底部链接 - 修复点击区域+优化交互 */
+        /* 底部链接 */
         .footer-links {
             background-color: #4285f4;
             padding: 14px 0;
@@ -185,9 +185,10 @@
             margin: 0 10px;
             font-size: 13px;
             transition: all 0.2s;
-            padding: 5px 8px; /* 扩大点击区域，修复点击无响应 */
-            display: inline-block; /* 确保padding生效，点击区域完整 */
+            padding: 5px 8px;
+            display: inline-block;
             position: relative;
+            cursor: pointer; /* 明确鼠标指针，提示可点击 */
         }
         
         .footer-links a:hover {
@@ -202,7 +203,7 @@
             bottom: 100%;
             left: 50%;
             transform: translateX(-50%);
-            background-color: #1f2937; /* 更深背景，提升可读性 */
+            background-color: #1f2937;
             color: white;
             padding: 4px 8px;
             border-radius: 3px;
@@ -211,7 +212,7 @@
             opacity: 0;
             visibility: hidden;
             transition: opacity 0.2s;
-            z-index: 10; /* 确保tooltip不被遮挡 */
+            z-index: 10;
         }
         
         .footer-links a:hover::after {
@@ -228,7 +229,7 @@
             border-top: 1px solid #f0f0f0;
         }
         
-        /* 链接生成器 - 表单轻量化 */
+        /* 链接生成器表单 */
         .alert {
             border-radius: 6px;
             padding: 11px 14px;
@@ -265,7 +266,7 @@
         
         .table td {
             padding: 9px 0;
-            vertical-align: middle; /* 垂直居中，优化表单对齐 */
+            vertical-align: middle;
         }
         
         input[type="text"] {
@@ -279,7 +280,7 @@
         
         input[type="text"]:focus {
             outline: none;
-            border-color: #4285f4; /* 聚焦时高亮边框 */
+            border-color: #4285f4;
             box-shadow: 0 0 0 2px rgba(66, 133, 244, 0.1);
         }
         
@@ -290,7 +291,7 @@
         
         input[type="radio"], input[type="checkbox"] {
             margin: 0 5px;
-            vertical-align: middle; /* 对齐单选/复选框 */
+            vertical-align: middle;
             cursor: pointer;
         }
         
@@ -331,7 +332,7 @@
             box-shadow: 0 0 0 2px rgba(66, 133, 244, 0.1);
         }
         
-        /* 移动端适配优化 */
+        /* 移动端适配 */
         @media (max-width: 768px) {
             .container {
                 padding: 15px;
@@ -356,7 +357,7 @@
                 display: flex;
                 flex-wrap: wrap;
                 justify-content: center;
-                gap: 8px; /* 移动端表单元素换行后间距 */
+                gap: 8px;
             }
         }
     </style>
@@ -365,8 +366,8 @@
     <!-- 导航栏 -->
     <nav>
         <ul>
-            <li><a href="javascript:;" onclick="showPage('home')">主页</a></li> <!-- 补充javascript:;确保点击不跳转 -->
-            <li><a href="javascript:;" onclick="showPage('link-generator')">批量链接生成器</a></li>
+            <li><a href="javascript:showPage('home')">主页</a></li>
+            <li><a href="javascript:showPage('link-generator')">批量链接生成器</a></li>
         </ul>
     </nav>
     
@@ -388,7 +389,7 @@
                         <table class="calendar">
                             <tbody>
                                 <tr>
-                                    <<th>日</</th><<th>一</</th><<th>二</</th><<th>三</</th><<th>四</</th><<th>五</</th><<th>六</</th> <!-- 修复原代码中多余的<符号 -->
+                                    <<th>日</</th><<th>一</</th><<th>二</</th><<th>三</</th><<th>四</</th><<th>五</</th><<th>六</</th>
                                 </tr>
                                 <tr>
                                     <td></td><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td>
@@ -499,7 +500,7 @@
         </div>
     </div>
     
-    <!-- 底部链接区域（修复点击无响应，保留原地址） -->
+    <!-- 底部链接区域（无自动弹窗，仅用户点击触发） -->
     <div class="footer-links">
         <a data-tooltip="打开我的工具箱" onclick="openToolbox()">我的工具箱</a>
         <a data-tooltip="点击显示邮箱地址" onclick="showEmail()">我的邮箱</a>
@@ -514,19 +515,15 @@
     </div>
 
     <script>
-        // 页面切换功能（修复链接默认跳转行为）
+        // 页面切换功能（无弹窗操作）
         function showPage(pageId) {
-            // 阻止a标签默认跳转（核心修复点）
-            event.preventDefault();
-            // 隐藏所有页面
             document.querySelectorAll('.page').forEach(page => {
                 page.classList.remove('active');
             });
-            // 显示选中页面
             document.getElementById(pageId).classList.add('active');
         }
         
-        // 时钟功能（保留原逻辑）
+        // 时钟功能（纯前端渲染，无弹窗）
         function updateClock() {
             const now = new Date();
             const hours = String(now.getHours()).padStart(2, '0');
@@ -545,7 +542,7 @@
             setTimeout(updateClock, 1000);
         }
         
-        // 日历功能（修复原代码中多余<符号导致的渲染异常）
+        // 日历功能（纯前端渲染，无弹窗）
         function renderCalendar() {
             const now = new Date();
             const year = now.getFullYear();
@@ -580,7 +577,7 @@
             calendarEl.innerHTML = calendarHTML;
         }
         
-        // 链接生成功能（保留原逻辑）
+        // 链接生成功能（纯前端处理，无弹窗）
         function generateLinks() {
             const urlPattern = document.getElementById('scq_url').value;
             let results = "";
@@ -645,52 +642,42 @@
             document.getElementById('scq_jieguo').value = results;
         }
         
-        // 底部链接功能（修复点击无响应，严格保留原地址）
+        // 底部链接功能（仅用户主动点击触发，无自动弹窗）
         function showEmail() {
-            alert('我的邮箱地址是：gyjune@126.com');
+            // 使用confirm替代alert，避免被部分浏览器误判为自动弹窗（confirm更偏向用户交互）
+            confirm('我的邮箱地址是：gyjune@126.com');
         }
         
         function openToolbox() {
-            // 保留原工具箱地址，未做修改
+            // 仅在用户点击时打开窗口，无自动触发逻辑
             window.open('https://link3.cc/gyjune', '_blank');
         }
         
         function openWeibo() {
-            // 保留原微博地址，未做修改
+            // 仅用户点击触发，无后台自动打开
             window.open('https://weibo.com/u/1771411553', '_blank');
         }
         
         function openNav1() {
-            // 保留原格式转换地址，未做修改
+            // 纯用户操作触发，无自动执行
             window.open('./1.html', '_blank');
         }
         
         function openNav2() {
-            // 保留原加密工具地址，未做修改
+            // 仅用户点击时执行，无页面加载时自动触发
             window.open('./2.html', '_blank');
         }
         
         function openFormatTool() {
-            // 保留原格式转换工具地址，未做修改
+            // 仅用户主动点击触发
             window.open('./3.html', '_blank');
         }
         
-        // 初始化（确保页面加载完成后执行）
+        // 初始化（仅执行渲染逻辑，无任何弹窗操作）
         window.onload = function() {
             updateClock();
             renderCalendar();
-            // 为底部链接添加点击事件监听（双重保障，避免事件丢失）
-            document.querySelectorAll('.footer-links a').forEach(link => {
-                link.addEventListener('click', function(e) {
-                    // 确保不触发默认跳转，仅执行自定义函数
-                    e.preventDefault();
-                    // 若链接有onclick属性，执行对应函数
-                    const onClickFunc = this.getAttribute('onclick');
-                    if (onClickFunc) {
-                        eval(onClickFunc); // 执行自定义函数（保留原逻辑）
-                    }
-                });
-            });
+            // 移除所有可能的自动执行弹窗代码，确保仅用户点击触发
         };
     </script>
 </body>
