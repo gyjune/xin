@@ -1,0 +1,737 @@
+<html lang="zh-CN"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" id="mixia_vpid">
+    <title>TXT与M3U格式互转工具</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&amp;display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #e91e63;
+            --secondary-color: #ad1457;
+            --accent-color: #ff80ab;
+            --dark-color: #1a1a2e;
+            --light-color: #fce4ec;
+            --success-color: #4caf50;
+            --info-color: #2196f3; /* 蓝色 */
+            --warning-color: #ff9800;
+            --danger-color: #f44336;
+            --purple-color: #9c27b0; /* 紫色 */
+            --glass-effect: rgba(248, 249, 250, 0.9);
+            --glass-border: 1px solid rgba(108, 117, 125, 0.2);
+            --shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            color: #38001f;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+            background-color: #f8f9fa;
+        }
+
+        .bg-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: #f8f9fa;
+            transition: var(--transition);
+        }
+
+        .bg-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(248, 249, 250, 0.8);
+            backdrop-filter: blur(2px);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+            animation: fadeInDown 0.8s ease;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(45deg, var(--accent-color), var(--primary-color));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            font-size: 1rem;
+            color: rgba(88, 0, 46, 0.7);
+            margin-bottom: 1.5rem;
+        }
+
+        .card {
+            background: var(--glass-effect);
+            backdrop-filter: blur(10px);
+            border: var(--glass-border);
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+            transition: var(--transition);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.15);
+        }
+
+        .mode-switch {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .mode-btn {
+            padding: 0.8rem 1.8rem;
+            border-radius: 50px;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(255, 255, 255, 0.9);
+            color: #880e4f;
+            border: 1px solid rgba(108, 117, 125, 0.2);
+        }
+
+        .mode-btn:hover {
+            background: rgba(255, 255, 255, 1);
+            border-color: var(--primary-color);
+        }
+
+        .mode-btn.active-mode {
+            background: var(--primary-color);
+            color: white;
+            box-shadow: 0 4px 15px rgba(233, 30, 99, 0.2);
+        }
+
+        .mode-btn i {
+            font-size: 1rem;
+        }
+
+        .input-output-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .input-output-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .text-container h3 {
+            margin-bottom: 1rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #880e4f;
+        }
+
+        .text-container h3 i {
+            color: var(--primary-color);
+        }
+
+        .input-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .file-upload-btn {
+            padding: 0.8rem 1.8rem;
+            background: var(--purple-color); /* 紫色背景 */
+            color: white; /* 白色文字 */
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            border: 1px solid rgba(108, 117, 125, 0.2);
+            margin: 0 0.5rem;
+        }
+
+        .file-upload-btn:hover {
+            background: #7b1fa2; /* 深紫色悬停效果 */
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(156, 39, 176, 0.2);
+        }
+
+        textarea {
+            width: 100%;
+            height: 300px;
+            padding: 1rem;
+            border-radius: 10px;
+            border: var(--glass-border);
+            background: rgba(255, 255, 255, 0.9);
+            color: #38001f;
+            font-family: 'Noto Sans SC', sans-serif;
+            resize: vertical;
+            transition: var(--transition);
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(233, 30, 99, 0.2);
+        }
+
+        #outputArea {
+            background: rgba(255, 255, 255, 0.95);
+        }
+
+        .button-group {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .btn {
+            padding: 0.8rem 1.8rem;
+            border-radius: 50px;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--secondary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(233, 30, 99, 0.2);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.9);
+            color: #880e4f;
+            border: 1px solid rgba(108, 117, 125, 0.2);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 1);
+            transform: translateY(-2px);
+            border-color: var(--primary-color);
+        }
+
+        .btn-success {
+            background: var(--success-color);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #3d8b40;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(76, 175, 80, 0.2);
+        }
+
+        .btn-info {
+            background: var(--info-color); /* 蓝色背景 */
+            color: white;
+        }
+
+        .btn-info:hover {
+            background: #0b7dda; /* 深蓝色悬停效果 */
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(33, 150, 243, 0.2);
+        }
+
+        .btn-danger {
+            background: var(--danger-color);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #d32f2f;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(244, 67, 54, 0.2);
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 2rem;
+            color: rgba(136, 14, 79, 0.7);
+            font-size: 0.9rem;
+        }
+
+        footer a {
+            color: var(--primary-color);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        footer a:hover {
+            color: var(--secondary-color);
+            text-decoration: underline;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--success-color);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            transform: translateX(200%);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.error {
+            background: var(--danger-color);
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .pulse {
+            animation: pulse 1.5s infinite;
+        }
+
+        .drop-area {
+            position: relative;
+        }
+
+        .drop-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(233, 30, 99, 0.9);
+            border: 2px dashed var(--accent-color);
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+            z-index: 10;
+            color: white;
+        }
+
+        .drop-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .drop-overlay i {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        #fileInput {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-container" id="dynamicBg"></div>
+    <div class="bg-overlay"></div>
+
+    <div class="container">
+        <header>
+            <h1>TXT与M3U格式互转工具</h1>
+            <p class="subtitle">高效、简洁、专业的多媒体列表转换解决方案</p>
+        </header>
+
+        <main>
+            <div class="card">
+                <div class="mode-switch">
+                    <button id="txtToM3U" class="mode-btn" onclick="switchMode('txt2m3u')">
+                        <i class="fas fa-exchange-alt"></i> TXT → M3U
+                    </button>
+                    <button id="m3uToTxt" class="mode-btn active-mode" onclick="switchMode('m3u2txt')">
+                        <i class="fas fa-exchange-alt"></i> M3U → TXT
+                    </button>
+                </div>
+
+                <div class="input-output-container">
+                    <div class="text-container">
+                        <div class="input-header">
+                            <h3 id="inputLabel"><i class="fas fa-file-code"></i> M3U格式源:</h3>
+                        </div>
+                        <div class="drop-area" id="dropArea">
+                            <textarea id="inputArea" placeholder="在此粘贴M3U内容..."></textarea>
+                            <div class="drop-overlay" id="dropOverlay">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <p>拖放文件到此处</p>
+                            </div>
+                        </div>
+                        <input type="file" id="fileInput" accept=".txt,.m3u,.m3u8">
+                    </div>
+
+                    <div class="text-container">
+                        <h3 id="outputLabel"><i class="fas fa-paste"></i> TXT格式结果:</h3>
+                        <textarea id="outputArea" readonly=""></textarea>
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn btn-primary pulse" onclick="convert()">
+                        <i class="fas fa-sync-alt"></i> 转换格式
+                    </button>
+                    <button class="btn btn-danger" onclick="clearScreen()">
+                        <i class="fas fa-trash-alt"></i> 清除内容
+                    </button>
+                    <button class="btn btn-success" onclick="copyResult()">
+                        <i class="fas fa-copy"></i> 复制结果
+                    </button>
+                    <button class="btn btn-info" onclick="saveFile()">
+                        <i class="fas fa-download"></i> 保存文件
+                    </button>
+                    <label for="fileInput" class="file-upload-btn">
+                        <i class="fas fa-upload"></i> 上传文件
+                    </label>
+                </div>
+            </div>
+        </main>
+
+        <footer id="copyright">
+            © 2025 <a href="https://gyjune.kesug.com" target="_blank">我的主页</a>
+        </footer>
+    </div>
+
+    <div class="notification" id="notification">
+        <i class="fas fa-check-circle"></i>
+        <span id="notificationText">没有内容可保存</span>
+    </div>
+
+    <script>
+        // 当前模式
+        let currentMode = 'm3u2txt';
+
+        // 显示通知
+        function showNotification(message, isError = false) {
+            const notification = document.getElementById('notification');
+            const notificationText = document.getElementById('notificationText');
+            
+            notificationText.textContent = message;
+            notification.classList.remove('error');
+            
+            if (isError) {
+                notification.classList.add('error');
+            }
+            
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        // 切换模式
+        function switchMode(mode) {
+            currentMode = mode;
+            document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active-mode'));
+            document.getElementById(mode === 'txt2m3u' ? 'txtToM3U' : 'm3uToTxt').classList.add('active-mode');
+            
+            document.getElementById('inputLabel').innerHTML = mode === 'txt2m3u' ? 
+                '<i class="fas fa-paste"></i> TXT格式源:' : '<i class="fas fa-file-code"></i> M3U格式源:';
+            document.getElementById('outputLabel').innerHTML = mode === 'txt2m3u' ? 
+                '<i class="fas fa-file-code"></i> M3U格式结果:' : '<i class="fas fa-paste"></i> TXT格式结果:';
+            document.getElementById('inputArea').placeholder = mode === 'txt2m3u' ? 
+                '在此粘贴TXT内容...' : '在此粘贴M3U内容...';
+            
+            // 清空输出区域
+            document.getElementById('outputArea').value = '';
+            
+            // 给按钮添加脉冲动画
+            const convertBtn = document.querySelector('.btn-primary');
+            convertBtn.classList.add('pulse');
+        }
+
+        // 转换函数
+        function convert() {
+            try {
+                currentMode === 'txt2m3u' ? convertToM3U() : convertToTXT();
+                
+                // 移除按钮脉冲动画
+                const convertBtn = document.querySelector('.btn-primary');
+                convertBtn.classList.remove('pulse');
+                
+                showNotification('转换成功！');
+            } catch (error) {
+                showNotification('转换出错: ' + error.message, true);
+            }
+        }
+
+        // 转换为M3U
+        function convertToM3U() {
+            const input = document.getElementById('inputArea').value;
+            if (!input.trim()) {
+                throw new Error('请输入内容');
+            }
+            
+            const lines = input.split('\n').filter(line => line.trim() !== '');
+            let m3u = '#EXTM3U x-tvg-url="https://live.fanmingming.cn/e.xml"\n';
+            let currentGroup = null;
+
+            lines.forEach(line => {
+                const trimmed = line.trim();
+                if (trimmed.includes('#genre#')) {
+                    currentGroup = trimmed.replace(',#genre#', '');
+                } else if (trimmed) {
+                    const [name, url] = trimmed.split(',').map(s => s.trim());
+                    if (!name || !url) {
+                        throw new Error('格式错误: 每行应为"频道名称,URL"格式');
+                    }
+                    
+                    const processedName = name.replace(/(CCTV|CETV)-\d+.*/, '$1$2');
+                    m3u += `#EXTINF:-1 tvg-name="${processedName}" tvg-logo="https://live.fanmingming.cn/tv/${processedName}.png"`;
+                    if (currentGroup) m3u += ` group-title="${currentGroup}"`;
+                    m3u += `,${name}\n${url}\n`;
+                }
+            });
+
+            document.getElementById('outputArea').value = m3u;
+        }
+
+        // 转换为TXT
+        function convertToTXT() {
+            const input = document.getElementById('inputArea').value;
+            if (!input.trim()) {
+                throw new Error('请输入内容');
+            }
+            
+            const lines = input.split('\n').filter(line => line.trim() !== '');
+            let txt = '';
+            let currentGroup = null;
+
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i].trim();
+                if (line.startsWith('#EXTINF')) {
+                    const extinf = line;
+                    const url = lines[++i];
+                    
+                    if (!url) {
+                        throw new Error('格式错误: #EXTINF后缺少URL');
+                    }
+                    
+                    // 解析分组信息
+                    const groupMatch = extinf.match(/group-title="([^"]+)"/);
+                    const group = groupMatch ? groupMatch[1] : currentGroup;
+                    
+                    // 解析频道名称
+                    const nameMatch = extinf.match(/,(.*)$/);
+                    const name = nameMatch ? nameMatch[1] : '未知频道';
+                    
+                    // 处理分组变化
+                    if (group &amp;&amp; group !== currentGroup) {
+                        currentGroup = group;
+                        txt += `\n${currentGroup},#genre#\n`;
+                    }
+                    
+                    txt += `${name},${url}\n`;
+                }
+            }
+
+            document.getElementById('outputArea').value = txt.trim();
+        }
+
+        // 清空屏幕
+        function clearScreen() {
+            document.getElementById('inputArea').value = '';
+            document.getElementById('outputArea').value = '';
+            
+            // 给按钮添加脉冲动画
+            const convertBtn = document.querySelector('.btn-primary');
+            convertBtn.classList.add('pulse');
+            
+            showNotification('已清空内容');
+        }
+
+        // 复制结果
+        function copyResult() {
+            const output = document.getElementById('outputArea');
+            if (!output.value.trim()) {
+                showNotification('没有内容可复制', true);
+                return;
+            }
+            
+            output.select();
+            document.execCommand('copy');
+            showNotification('已复制到剪贴板！');
+        }
+
+        // 保存文件
+        function saveFile() {
+            const content = document.getElementById('outputArea').value;
+            if (!content.trim()) {
+                showNotification('没有内容可保存', true);
+                return;
+            }
+            
+            const extension = currentMode === 'txt2m3u' ? 'm3u' : 'txt';
+            const blob = new Blob([content], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `live.${extension}`;
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            showNotification(`文件已保存为 live.${extension}`);
+        }
+
+        // 文件上传处理
+        function handleFileUpload(file) {
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                const content = e.target.result;
+                document.getElementById('inputArea').value = content;
+                
+                // 根据文件扩展名自动切换模式
+                const extension = file.name.split('.').pop().toLowerCase();
+                if (extension === 'txt' &amp;&amp; currentMode !== 'txt2m3u') {
+                    switchMode('txt2m3u');
+                } else if ((extension === 'm3u' || extension === 'm3u8') &amp;&amp; currentMode !== 'm3u2txt') {
+                    switchMode('m3u2txt');
+                }
+                
+                showNotification(`已加载文件: ${file.name}`);
+            };
+            
+            reader.onerror = function() {
+                showNotification('读取文件时出错', true);
+            };
+            
+            reader.readAsText(file);
+        }
+
+        // 初始化文件上传功能
+        function initFileUpload() {
+            const fileInput = document.getElementById('fileInput');
+            const dropArea = document.getElementById('dropArea');
+            const dropOverlay = document.getElementById('dropOverlay');
+            
+            // 点击上传按钮
+            fileInput.addEventListener('change', function(e) {
+                if (this.files &amp;&amp; this.files.length > 0) {
+                    handleFileUpload(this.files[0]);
+                }
+            });
+            
+            // 拖放事件处理
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                dropArea.addEventListener(eventName, preventDefaults, false);
+            });
+            
+            function preventDefaults(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+            
+            ['dragenter', 'dragover'].forEach(eventName => {
+                dropArea.addEventListener(eventName, highlight, false);
+            });
+            
+            ['dragleave', 'drop'].forEach(eventName => {
+                dropArea.addEventListener(eventName, unhighlight, false);
+            });
+            
+            function highlight() {
+                dropOverlay.classList.add('active');
+            }
+            
+            function unhighlight() {
+                dropOverlay.classList.remove('active');
+            }
+            
+            // 处理文件拖放
+            dropArea.addEventListener('drop', function(e) {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+                
+                if (files &amp;&amp; files.length > 0) {
+                    handleFileUpload(files[0]);
+                }
+            });
+        }
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            initFileUpload();
+        });
+    </script>
+
+</body></html>
