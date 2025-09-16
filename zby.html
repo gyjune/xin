@@ -1,0 +1,1612 @@
+<html lang="zh-CN"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" id="mixia_vpid">
+    <title>直播源管理器</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: white;
+            padding: 20px;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .description {
+            font-size: 1.1rem;
+            max-width: 800px;
+            margin: 0 auto;
+            opacity: 0.9;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #444;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            border-color: #4a90e2;
+            outline: none;
+        }
+        
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        button {
+            background: #4a90e2;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        button:hover {
+            background: #357abD;
+            transform: translateY(-2px);
+        }
+        
+        .btn-delete {
+            background: #e74c3c;
+        }
+        
+        .btn-delete:hover {
+            background: #c0392b;
+        }
+        
+        .btn-edit {
+            background: #f39c12;
+        }
+        
+        .btn-edit:hover {
+            background: #d35400;
+        }
+        
+        .btn-copy {
+            background: #27ae60;
+        }
+        
+        .btn-copy:hover {
+            background: #219653;
+        }
+        
+        .btn-download {
+            background: #9b59b6;
+        }
+        
+        .btn-download:hover {
+            background: #8e44ad;
+        }
+        
+        .btn-upload {
+            background: #16a085;
+        }
+        
+        .btn-upload:hover {
+            background: #1abc9c;
+        }
+        
+        .btn-clear {
+            background: #7f8c8d;
+        }
+        
+        .btn-clear:hover {
+            background: #95a5a6;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        
+        th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            color: #555;
+        }
+        
+        tr:hover {
+            background-color: #f5f7ff;
+        }
+        
+        .actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .actions button {
+            padding: 8px 12px;
+            font-size: 14px;
+        }
+        
+        .message {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            text-align: center;
+            display: none;
+        }
+        
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .custom-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .custom-input {
+            display: none;
+            margin-top: 10px;
+        }
+        
+        .sources-output {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+            font-family: monospace;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+        
+        .output-controls {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        /* 上传区域样式优化 */
+        .upload-area {
+            border: 2px dashed #4a90e2;
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+            margin-bottom: 20px;
+            background-color: #f8f9fa;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .upload-area:hover, .upload-area.dragover {
+            background-color: #e3f2fd;
+            border-color: #2196F3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(33, 150, 243, 0.2);
+        }
+        
+        .upload-area i {
+            font-size: 3rem;
+            color: #4a90e2;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+        }
+        
+        .upload-area:hover i {
+            color: #2196F3;
+            transform: scale(1.1);
+        }
+        
+        .upload-area h3 {
+            margin-bottom: 10px;
+            color: #444;
+        }
+        
+        .upload-area p {
+            margin: 10px 0;
+            color: #666;
+        }
+        
+        .upload-area .file-types {
+            font-size: 0.9rem;
+            color: #888;
+            margin-top: 5px;
+        }
+        
+        /* 上传进度条 */
+        .upload-progress {
+            height: 6px;
+            background: #e0e0e0;
+            border-radius: 3px;
+            margin: 15px 0;
+            overflow: hidden;
+            display: none;
+        }
+        
+        .upload-progress-bar {
+            height: 100%;
+            background: #4CAF50;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        
+        .upload-status {
+            font-size: 0.9rem;
+            color: #666;
+            display: none;
+        }
+        
+        .uploaded-sources {
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 10px;
+        }
+        
+        .source-item {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .source-item:last-child {
+            border-bottom: none;
+        }
+        
+        .source-item:hover {
+            background-color: #f5f7ff;
+        }
+        
+        .source-info {
+            flex: 1;
+        }
+        
+        .source-name {
+            font-weight: 600;
+        }
+        
+        .source-url {
+            font-size: 0.9rem;
+            color: #666;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: 400px;
+        }
+        
+        .input-clear {
+            position: absolute;
+            right: 10px;
+            top: 38px;
+            background: none;
+            border: none;
+            color: #999;
+            cursor: pointer;
+            font-size: 16px;
+            padding: 5px;
+        }
+        
+        .input-clear:hover {
+            color: #666;
+        }
+        
+        .form-controls {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        
+        .upload-options {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .upload-option {
+            flex: 1;
+            text-align: center;
+            padding: 15px;
+            border-radius: 8px;
+            background-color: #f8f9fa;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+        
+        .upload-option:hover {
+            background-color: #e9ecef;
+            border-color: #4a90e2;
+        }
+        
+        .upload-option.active {
+            background-color: #e3f2fd;
+            border-color: #4a90e2;
+        }
+        
+        .upload-option i {
+            font-size: 2rem;
+            color: #4a90e2;
+            margin-bottom: 10px;
+        }
+        
+        /* 管理自定义名称弹窗 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background-color: white;
+            border-radius: 12px;
+            padding: 25px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #444;
+        }
+        
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #999;
+        }
+        
+        .close-modal:hover {
+            color: #666;
+        }
+        
+        .custom-name-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 15px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .custom-name-item:last-child {
+            border-bottom: none;
+        }
+        
+        .custom-name-item:hover {
+            background-color: #f9f9f9;
+        }
+        
+        .custom-name-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .modal-footer {
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .no-custom-names {
+            text-align: center;
+            padding: 20px;
+            color: #999;
+        }
+        
+        .manage-custom-btn {
+            background: #7d3c98;
+            margin-top: 0;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .manage-custom-btn:hover {
+            background: #6c3483;
+        }
+        
+        .custom-name-form {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .custom-name-form input {
+            flex: 1;
+        }
+        
+        /* 按钮统一高度 */
+        .btn-download, .btn-clear {
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 15px;
+        }
+        
+        @media (max-width: 768px) {
+            .actions {
+                flex-direction: column;
+            }
+            
+            .output-controls {
+                flex-direction: column;
+            }
+            
+            .source-url {
+                max-width: 200px;
+            }
+            
+            .form-controls {
+                flex-direction: column;
+            }
+            
+            .upload-options {
+                flex-direction: column;
+            }
+            
+            .modal-footer {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .modal-footer button {
+                width: 100%;
+            }
+            
+            .custom-name-form {
+                flex-direction: column;
+            }
+            
+            .upload-area {
+                padding: 20px;
+            }
+            
+            .upload-area i {
+                font-size: 2.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>直播源管理器</h1>
+            <p class="description">添加和管理您的直播源地址，并为每个直播源设置易于识别的名称。数据将保存在本地浏览器中。</p>
+        </header>
+        
+        <div class="card">
+            <h2>上传直播源文件</h2>
+            
+            <div class="upload-options">
+                <div class="upload-option active" id="sourceUploadOption">
+                    <i class="fas fa-file-alt"></i>
+                    <h3>上传直播源文件</h3>
+                    <p>M3U/TXT格式，包含名称和URL</p>
+                </div>
+                <div class="upload-option" id="namesUploadOption">
+                    <i class="fas fa-list"></i>
+                    <h3>上传纯名称文件</h3>
+                    <p>TXT格式，每行一个频道名称</p>
+                </div>
+            </div>
+            
+            <div id="sourceUploadArea" class="upload-area">
+                <i class="fas fa-cloud-upload-alt"></i>
+                <h3>点击或拖放文件到此处上传</h3>
+                <p>支持M3U、TXT、M3U8格式文件</p>
+                <div class="file-types">支持格式: .m3u, .m3u8, .txt</div>
+                
+                <div class="upload-progress" id="sourceUploadProgress">
+                    <div class="upload-progress-bar" id="sourceProgressBar"></div>
+                </div>
+                <div class="upload-status" id="sourceUploadStatus"></div>
+                
+                <input type="file" id="fileInput" accept=".m3u,.txt,.m3u8" style="display: none;">
+            </div>
+            
+            <div id="namesUploadArea" class="upload-area" style="display: none;">
+                <i class="fas fa-cloud-upload-alt"></i>
+                <h3>点击或拖放纯名称文件到此处上传</h3>
+                <p>支持TXT格式文件，每行一个频道名称</p>
+                <div class="file-types">支持格式: .txt</div>
+                
+                <div class="upload-progress" id="namesUploadProgress">
+                    <div class="upload-progress-bar" id="namesProgressBar"></div>
+                </div>
+                <div class="upload-status" id="namesUploadStatus"></div>
+                
+                <input type="file" id="namesFileInput" accept=".txt" style="display: none;">
+            </div>
+            
+            <div id="uploadedSources" class="uploaded-sources" style="display: none;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <h3>上传的直播源（点击添加到列表）</h3>
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <button id="importAllBtn" class="btn-download">
+                            <i class="fas fa-download"></i> 一键导入所有源
+                        </button>
+                        <button id="clearUploadedBtn" class="btn-clear">
+                            <i class="fas fa-times"></i> 清空列表
+                        </button>
+                    </div>
+                </div>
+                <div id="sourcesList"></div>
+            </div>
+            
+            <div id="uploadedNames" class="uploaded-sources" style="display: none;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <h3>上传的频道名称（点击选择名称）</h3>
+                    <button id="clearNamesBtn" class="btn-clear">
+                        <i class="fas fa-times"></i> 清空列表
+                    </button>
+                </div>
+                <div id="namesList"></div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h2>添加直播源</h2>
+            <div class="form-group">
+                <label for="sourceName">直播名称</label>
+                <select id="sourceName">
+                    <option value="">-- 选择或输入直播名称 --</option>
+                    <option value="CCTV1">CCTV1</option>
+                    <option value="CCTV2">CCTV2</option>
+                    <option value="CCTV3">CCTV3</option>
+                    <option value="CCTV4">CCTV4</option>
+                    <option value="CCTV5">CCTV5</option>
+                    <option value="CCTV5+">CCTV5+</option>
+                    <option value="CCTV6">CCTV6</option>
+                    <option value="CCTV7">CCTV7</option>
+                    <option value="CCTV8">CCTV8</option>
+                    <option value="CCTV9">CCTV9</option>
+                    <option value="CCTV10">CCTV10</option>
+                    <option value="CCTV11">CCTV11</option>
+                    <option value="CCTV12">CCTV12</option>
+                    <option value="CCTV13">CCTV13</option>
+                    <option value="CCTV14">CCTV14</option>
+                    <option value="CCTV15">CCTV15</option>
+                    <option value="CCTV16">CCTV16</option>
+                    <option value="CCTV17">CCTV17</option>
+                    <option value="CGTN">CGTN</option>
+                    <option value="数字付费">数字付费</option>
+                    <option value="第一院线">第一院线</option>
+                    <option value="影视剧场">影视剧场</option>
+                    <option value="都市剧场">都市剧场</option>
+                    <option value="咪咕奥运">咪咕奥运</option>
+                    <option value="移动转播1">移动转播1</option>
+                    <option value="移动转播2">移动转播2</option>
+                    <option value="江苏卫视">江苏卫视</option>
+                    <option value="湖南卫视">湖南卫视</option>
+                    <option value="浙江卫视">浙江卫视</option>
+                    <option value="东方卫视">东方卫视</option>
+                    <option value="北京卫视">北京卫视</option>
+                    <option value="安徽卫视">安徽卫视</option>
+                    <option value="广东卫视">广东卫视</option>
+                    <option value="黑龙江卫视">黑龙江卫视</option>
+                    <option value="湖北卫视">湖北卫视</option>
+                    <option value="辽宁卫视">辽宁卫视</option>
+                    <option value="山东卫视">山东卫视</option>
+                    <option value="深圳卫视">深圳卫视</option>
+                    <option value="天津卫视">天津卫视</option>
+                    <option value="甘肃卫视">甘肃卫视</option>
+                    <option value="重庆卫视">重庆卫视</option>
+                    <option value="广西卫视">广西卫视</option>
+                    <option value="贵州卫视">贵州卫视</option>
+                    <option value="海南卫视">海南卫视</option>
+                    <option value="河北卫视">河北卫视</option>
+                    <option value="河南卫视">河南卫视</option>
+                    <option value="吉林卫视">吉林卫视</option>
+                    <option value="江西卫视">江西卫视</option>
+                    <option value="内蒙古卫视">内蒙古卫视</option>
+                    <option value="宁夏卫视">宁夏卫视</option>
+                    <option value="山西卫视">山西卫视</option>
+                    <option value="陕西卫视">陕西卫视</option>
+                    <option value="四川卫视">四川卫视</option>
+                    <option value="西藏卫视">西藏卫视</option>
+                    <option value="新疆卫视">新疆卫视</option>
+                    <option value="青海卫视">青海卫视</option>
+                    <option value="厦门卫视">厦门卫视</option>
+                    <option value="云南卫视">云南卫视</option>
+                    <option value="安多卫视">安多卫视</option>
+                    <option value="兵团卫视">兵团卫视</option>
+                    <option value="东南卫视">东南卫视</option>
+                    <option value="海峡卫视">海峡卫视</option>
+                    <option value="南方卫视">南方卫视</option>
+                    <option value="康巴卫视">康巴卫视</option>
+                    <option value="农林卫视">农林卫视</option>
+                    <option value="延边卫视">延边卫视</option>
+                    <option value="山东教育卫视">山东教育卫视</option>
+                    <option value="上海纪实人文">上海纪实人文</option>
+                    <option value="上海文广欢笑剧场">上海文广欢笑剧场</option>
+                    <option value="上海文广动漫秀场">上海文广动漫秀场</option>
+                    <option value="上海文广游戏风云">上海文广游戏风云</option>
+                    <option value="上海文广生活时尚">上海文广生活时尚</option>
+                    <option value="全纪实">全纪实</option>
+                    <option value="江苏城市">江苏城市</option>
+                    <option value="江苏公共新闻">江苏公共新闻</option>
+                    <option value="江苏教育">江苏教育</option>
+                    <option value="江苏体育休闲">江苏体育休闲</option>
+                    <option value="江苏影视">江苏影视</option>
+                    <option value="江苏综艺">江苏综艺</option>
+                    <option value="金鹰卡通">金鹰卡通</option>
+                    <option value="哈哈炫动">哈哈炫动</option>
+                    <option value="嘉佳卡通">嘉佳卡通</option>
+                    <option value="优漫卡通">优漫卡通</option>
+                    <option value="卡酷动画">卡酷动画</option>
+                    <option value="北京东奥纪实">北京东奥纪实</option>
+                    <option value="教育1台">教育1台</option>
+                    <option value="教育2台">教育2台</option>
+                    <option value="教育3台">教育3台</option>
+                    <option value="教育4台">教育4台</option>
+                    <option value="篮球频道">篮球频道</option>
+                    <option value="中数CCTV老故事">中数CCTV老故事</option>
+                    <option value="中数女性时尚">中数女性时尚</option>
+                    <option value="中数发现之旅">中数发现之旅</option>
+                    <option value="北广京视剧场">北广京视剧场</option>
+                    <option value="北广置业频道">北广置业频道</option>
+                    <option value="北广奕坛春秋">北广奕坛春秋</option>
+                    <option value="陶瓷频道">陶瓷频道</option>
+                    <option value="家庭理财">家庭理财</option>
+                    <option value="江苏广播">江苏广播</option>
+                    <option value="江苏财经广播">江苏财经广播</option>
+                    <option value="江苏健康广播">江苏健康广播</option>
+                    <option value="江苏文艺广播">江苏文艺广播</option>
+                    <option value="江苏音乐台">江苏音乐台</option>
+                    <option value="江苏经典流行音乐">江苏经典流行音乐</option>
+                    <option value="金陵之声">金陵之声</option>
+                    <option value="江苏交通广播网">江苏交通广播网</option>
+                    <option value="江苏新闻广播">江苏新闻广播</option>
+                    <option value="江苏新闻综合广播">江苏新闻综合广播</option>
+                    <option value="江苏故事广播">江苏故事广播</option>
+                    <option value="南京新闻">南京新闻</option>
+                    <option value="南京科教">南京科教</option>
+                    <option value="南京十八">南京十八</option>
+                    <option value="南京少儿">南京少儿</option>
+                    <option value="无锡新闻">无锡新闻</option>
+                    <option value="盐城1">盐城1</option>
+                    <option value="盐城2">盐城2</option>
+                    <option value="盐城3">盐城3</option>
+                    <option value="大丰一台">大丰一台</option>
+                    <option value="大丰二台">大丰二台</option>
+                    <option value="custom">-- 自定义名称 --</option>
+                </select>
+                <div id="customNameInput" class="custom-input">
+                    <input type="text" id="customName" placeholder="输入自定义直播名称">
+                    <button class="input-clear" title="清空" onclick="clearCustomName()">
+                        <i class="fas fa-times-circle"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="sourceUrl">直播源地址</label>
+                <input type="text" id="sourceUrl" placeholder="输入直播源地址（例如：https://example.com/stream.m3u8）">
+                <button class="input-clear" title="清空" onclick="clearSourceUrl()">
+                    <i class="fas fa-times-circle"></i>
+                </button>
+            </div>
+            
+            <div class="form-controls">
+                <button id="addBtn"><i class="fas fa-plus"></i> 添加直播源</button>
+                <button id="clearFormBtn" class="btn-clear"><i class="fas fa-broom"></i> 清空表单</button>
+                <button id="manageCustomBtn" class="manage-custom-btn"><i class="fas fa-cog"></i> 自定义名称管理</button>
+            </div>
+            
+            <div id="message" class="message"></div>
+        </div>
+        
+        <div class="card">
+            <h2>已添加的直播源</h2>
+            <div class="sources-output" id="sourcesOutput">暂无直播源，请添加</div>
+            <div class="output-controls">
+                <button id="copyBtn" class="btn-copy"><i class="fas fa-copy"></i> 复制内容</button>
+                <button id="downloadBtn" class="btn-download"><i class="fas fa-download"></i> 下载结果</button>
+                <button id="clearBtn" class="btn-delete"><i class="fas fa-trash"></i> 清空列表</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 管理自定义名称弹窗 -->
+    <div id="customNamesModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">管理自定义名称</h3>
+                <button class="close-modal">×</button>
+            </div>
+            
+            <div class="custom-name-form">
+                <input type="text" id="newCustomName" placeholder="输入新的自定义名称">
+                <button id="addCustomNameBtn"><i class="fas fa-plus"></i> 添加</button>
+            </div>
+            
+            <div id="customNamesList">
+                <!-- 自定义名称列表将在这里动态生成 -->
+            </div>
+            <div class="modal-footer">
+                <button id="deleteAllCustomBtn" class="btn-delete">删除所有自定义名称</button>
+                <button id="closeModalBtn" class="btn-clear">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const addButton = document.getElementById('addBtn');
+            const sourceNameSelect = document.getElementById('sourceName');
+            const customNameInput = document.getElementById('customNameInput');
+            const customNameField = document.getElementById('customName');
+            const sourceUrlInput = document.getElementById('sourceUrl');
+            const sourcesOutput = document.getElementById('sourcesOutput');
+            const messageDiv = document.getElementById('message');
+            const copyButton = document.getElementById('copyBtn');
+            const downloadButton = document.getElementById('downloadBtn');
+            const clearButton = document.getElementById('clearBtn');
+            const clearFormButton = document.getElementById('clearFormBtn');
+            const clearUploadedButton = document.getElementById('clearUploadedBtn');
+            const clearNamesButton = document.getElementById('clearNamesBtn');
+            const fileInput = document.getElementById('fileInput');
+            const namesFileInput = document.getElementById('namesFileInput');
+            const sourceUploadArea = document.getElementById('sourceUploadArea');
+            const namesUploadArea = document.getElementById('namesUploadArea');
+            const uploadedSources = document.getElementById('uploadedSources');
+            const uploadedNames = document.getElementById('uploadedNames');
+            const sourcesList = document.getElementById('sourcesList');
+            const namesList = document.getElementById('namesList');
+            const sourceUploadOption = document.getElementById('sourceUploadOption');
+            const namesUploadOption = document.getElementById('namesUploadOption');
+            const manageCustomBtn = document.getElementById('manageCustomBtn');
+            const customNamesModal = document.getElementById('customNamesModal');
+            const customNamesList = document.getElementById('customNamesList');
+            const closeModalBtn = document.getElementById('closeModalBtn');
+            const deleteAllCustomBtn = document.getElementById('deleteAllCustomBtn');
+            const closeModalButton = document.querySelector('.close-modal');
+            const newCustomNameInput = document.getElementById('newCustomName');
+            const addCustomNameBtn = document.getElementById('addCustomNameBtn');
+            const importAllBtn = document.getElementById('importAllBtn');
+            const sourceProgressBar = document.getElementById('sourceProgressBar');
+            const namesProgressBar = document.getElementById('namesProgressBar');
+            const sourceUploadProgress = document.getElementById('sourceUploadProgress');
+            const namesUploadProgress = document.getElementById('namesUploadProgress');
+            const sourceUploadStatus = document.getElementById('sourceUploadStatus');
+            const namesUploadStatus = document.getElementById('namesUploadStatus');
+            
+            let editIndex = -1;
+            let sources = JSON.parse(localStorage.getItem('liveSources')) || [];
+            let uploadedItems = [];
+            let uploadedNameItems = [];
+            
+            // 内置名称列表 - 这些不能被删除
+            const builtInNames = [
+                'CCTV1', 'CCTV2', 'CCTV3', 'CCTV4', 'CCTV5', 'CCTV5+', 
+                'CCTV6', 'CCTV7', 'CCTV8', 'CCTV9', 'CCTV10', 'CCTV11', 
+                'CCTV12', 'CCTV13', 'CCTV14', 'CCTV15', 'CCTV16', 'CCTV17',
+                'CGTN', '数字付费', '第一院线', '影视剧场', '都市剧场', '咪咕奥运', 
+                '移动转播1', '移动转播2', '江苏卫视', '湖南卫视', '浙江卫视', '东方卫视', 
+                '北京卫视', '安徽卫视', '广东卫视', '黑龙江卫视', '湖北卫视', '辽宁卫视', 
+                '山东卫视', '深圳卫视', '天津卫视', '甘肃卫视', '重庆卫视', '广西卫视', 
+                '贵州卫视', '海南卫视', '河北卫视', '河南卫视', '吉林卫视', '江西卫视', 
+                '内蒙古卫视', '宁夏卫视', '山西卫视', '陕西卫视', '四川卫视', '西藏卫视', 
+                '新疆卫视', '青海卫视', '厦门卫视', '云南卫视', '安多卫视', '兵团卫视', 
+                '东南卫视', '海峡卫视', '南方卫视', '康巴卫视', '农林卫视', '延边卫视', 
+                '山东教育卫视', '上海纪实人文', '上海文广欢笑剧场', '上海文广动漫秀场', 
+                '上海文广游戏风云', '上海文广生活时尚', '全纪实', '江苏城市', '江苏公共新闻', 
+                '江苏教育', '江苏体育休闲', '江苏影视', '江苏综艺', '金鹰卡通', '哈哈炫动', 
+                '嘉佳卡通', '优漫卡通', '卡酷动画', '北京东奥纪实', '教育1台', '教育2台', 
+                '教育3台', '教育4台', '篮球频道', '中数CCTV老故事', '中数女性时尚', 
+                '中数发现之旅', '北广京视剧场', '北广置业频道', '北广奕坛春秋', '陶瓷频道', 
+                '家庭理财', '江苏广播', '江苏财经广播', '江苏健康广播', '江苏文艺广播', 
+                '江苏音乐台', '江苏经典流行音乐', '金陵之声', '江苏交通广播网', '江苏新闻广播', 
+                '江苏新闻综合广播', '江苏故事广播', '南京新闻', '南京科教', '南京十八', 
+                '南京少儿', '无锡新闻', '盐城1', '盐城2', '盐城3', '大丰一台', '大丰二台'
+            ];
+            
+            // 初始化
+            generateSourcesOutput();
+            
+            // 显示自定义名称输入框
+            sourceNameSelect.addEventListener('change', function() {
+                if (this.value === 'custom') {
+                    customNameInput.style.display = 'block';
+                    customNameField.focus();
+                } else {
+                    customNameInput.style.display = 'none';
+                }
+            });
+            
+            // 显示消息
+            function showMessage(message, type) {
+                messageDiv.textContent = message;
+                messageDiv.className = 'message ' + type;
+                messageDiv.style.display = 'block';
+                
+                setTimeout(() => {
+                    messageDiv.style.display = 'none';
+                }, 3000);
+            }
+            
+            // 生成直播源输出内容
+            function generateSourcesOutput() {
+                if (sources.length === 0) {
+                    sourcesOutput.textContent = '暂无直播源，请添加';
+                    return;
+                }
+                
+                let output = '';
+                sources.forEach(source => {
+                    output += `${source.name},${source.url}\n`;
+                });
+                sourcesOutput.textContent = output;
+            }
+            
+            // 获取直播名称
+            function getSourceName() {
+                if (sourceNameSelect.value === 'custom') {
+                    return customNameField.value.trim();
+                }
+                return sourceNameSelect.value.trim();
+            }
+            
+            // 添加直播源
+            function addSource() {
+                const name = getSourceName();
+                const url = sourceUrlInput.value.trim();
+                
+                if (!name || !url) {
+                    showMessage('直播名称和地址都不能为空', 'error');
+                    return;
+                }
+                
+                if (editIndex === -1) {
+                    // 添加新源
+                    sources.push({ name, url });
+                    showMessage('直播源添加成功', 'success');
+                } else {
+                    // 更新现有源
+                    sources[editIndex] = { name, url };
+                    showMessage('直播源更新成功', 'success');
+                    editIndex = -1;
+                    addButton.innerHTML = '<i class="fas fa-plus"></i> 添加直播源';
+                }
+                
+                // 保存到本地存储
+                localStorage.setItem('liveSources', JSON.stringify(sources));
+                
+                // 清空输入框
+                clearForm();
+                
+                // 重新生成输出
+                generateSourcesOutput();
+            }
+            
+            // 清空表单
+            function clearForm() {
+                sourceNameSelect.value = '';
+                customNameField.value = '';
+                customNameInput.style.display = 'none';
+                sourceUrlInput.value = '';
+            }
+            
+            // 清空自定义名称
+            function clearCustomName() {
+                customNameField.value = '';
+                customNameField.focus();
+            }
+            
+            // 清空源URL
+            function clearSourceUrl() {
+                sourceUrlInput.value = '';
+                sourceUrlInput.focus();
+            }
+            
+            // 清空上传的源列表
+            function clearUploadedSources() {
+                uploadedItems = [];
+                sourcesList.innerHTML = '';
+                uploadedSources.style.display = 'none';
+                showMessage('已清空上传的直播源列表', 'success');
+            }
+            
+            // 清空上传的名称列表
+            function clearUploadedNames() {
+                uploadedNameItems = [];
+                namesList.innerHTML = '';
+                uploadedNames.style.display = 'none';
+                showMessage('已清空上传的频道名称列表', 'success');
+            }
+            
+            // 复制内容到剪贴板
+            function copyToClipboard() {
+                if (sources.length === 0) {
+                    showMessage('没有内容可复制', 'error');
+                    return;
+                }
+                
+                const text = sourcesOutput.textContent;
+                navigator.clipboard.writeText(text).then(() => {
+                    showMessage('内容已复制到剪贴板', 'success');
+                }).catch(err => {
+                    showMessage('复制失败: ' + err, 'error');
+                });
+            }
+            
+            // 下载结果
+            function downloadResults() {
+                if (sources.length === 0) {
+                    showMessage('没有内容可下载', 'error');
+                    return;
+                }
+                
+                let content = '';
+                sources.forEach(source => {
+                    content += `${source.name},${source.url}\n`;
+                });
+                
+                const blob = new Blob([content], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'live_sources.txt';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                showMessage('文件下载成功', 'success');
+            }
+            
+            // 清空列表
+            function clearSources() {
+                if (sources.length === 0) {
+                    showMessage('列表已经是空的', 'error');
+                    return;
+                }
+                
+                if (confirm('确定要清空所有直播源吗？此操作不可撤销。')) {
+                    sources = [];
+                    localStorage.setItem('liveSources', JSON.stringify(sources));
+                    generateSourcesOutput();
+                    showMessage('列表已清空', 'success');
+                }
+            }
+            
+            // 一键导入所有上传的源
+            function importAllSources() {
+                if (uploadedItems.length === 0) {
+                    showMessage('没有可导入的直播源', 'error');
+                    return;
+                }
+                
+                // 添加所有上传的源到主列表
+                uploadedItems.forEach(item => {
+                    sources.push({ name: item.name, url: item.url });
+                });
+                
+                // 保存到本地存储
+                localStorage.setItem('liveSources', JSON.stringify(sources));
+                
+                // 重新生成输出
+                generateSourcesOutput();
+                
+                showMessage(`成功导入 ${uploadedItems.length} 个直播源`, 'success');
+                
+                // 可选：清空上传列表
+                clearUploadedSources();
+            }
+            
+            // 处理文件上传
+            function handleFileUpload(file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        const content = e.target.result;
+                        parseUploadedFile(content, file.name);
+                    } catch (error) {
+                        showMessage('文件解析失败: ' + error.message, 'error');
+                    }
+                };
+                reader.readAsText(file);
+            }
+            
+            // 处理纯名称文件上传
+            function handleNamesFileUpload(file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        const content = e.target.result;
+                        parseNamesFile(content);
+                    } catch (error) {
+                        showMessage('文件解析失败: ' + error.message, 'error');
+                    }
+                };
+                reader.readAsText(file);
+            }
+            
+            // 解析上传的文件
+            function parseUploadedFile(content, filename) {
+                uploadedItems = [];
+                
+                if (filename.endsWith('.m3u') || filename.endsWith('.m3u8')) {
+                    // 解析M3U文件
+                    const lines = content.split('\n');
+                    let currentName = '';
+                    
+                    for (let i = 0; i < lines.length; i++) {
+                        const line = lines[i].trim();
+                        
+                        if (line.startsWith('#EXTINF:')) {
+                            // 提取频道名称
+                            const nameMatch = line.match(/#EXTINF:.*?,(.*)/);
+                            if (nameMatch &amp;&amp; nameMatch[1]) {
+                                currentName = nameMatch[1];
+                            }
+                        } else if (line &amp;&amp; !line.startsWith('#') &amp;&amp; currentName) {
+                            // 这是URL行
+                            uploadedItems.push({
+                                name: currentName,
+                                url: line
+                            });
+                            currentName = '';
+                        }
+                    }
+                } else {
+                    // 解析TXT文件 - 支持两种格式
+                    const lines = content.split('\n');
+                    let hasNameUrlFormat = false;
+                    
+                    // 首先检查是否有"名称,URL"格式的行
+                    for (let i = 0; i < lines.length; i++) {
+                        const line = lines[i].trim();
+                        if (!line) continue;
+                        
+                        // 检查是否包含逗号分隔的名称和URL
+                        if (line.includes(',') &amp;&amp; line.split(',').length >= 2) {
+                            hasNameUrlFormat = true;
+                            break;
+                        }
+                    }
+                    
+                    // 根据格式解析
+                    for (let i = 0; i < lines.length; i++) {
+                        const line = lines[i].trim();
+                        if (!line) continue;
+                        
+                        if (hasNameUrlFormat) {
+                            // 处理"名称,URL"格式
+                            const parts = line.split(',');
+                            if (parts.length >= 2) {
+                                const name = parts[0].trim();
+                                const url = parts.slice(1).join(',').trim(); // 处理URL中可能包含逗号的情况
+                                
+                                if (name &amp;&amp; url) {
+                                    uploadedItems.push({ name, url });
+                                }
+                            }
+                        } else {
+                            // 处理纯URL列表
+                            // 检查是否是有效的URL
+                            try {
+                                new URL(line);
+                                uploadedItems.push({ 
+                                    name: `频道 ${i+1}`, 
+                                    url: line 
+                                });
+                            } catch (e) {
+                                // 不是有效的URL，跳过
+                                console.warn(`跳过无效URL: ${line}`);
+                            }
+                        }
+                    }
+                }
+                
+                if (uploadedItems.length > 0) {
+                    displayUploadedSources();
+                    showMessage(`成功解析 ${uploadedItems.length} 个直播源`, 'success');
+                } else {
+                    showMessage('未找到有效的直播源', 'error');
+                }
+            }
+            
+            // 解析纯名称文件
+            function parseNamesFile(content) {
+                uploadedNameItems = [];
+                const lines = content.split('\n');
+                
+                for (let i = 0; i < lines.length; i++) {
+                    const line = lines[i].trim();
+                    if (line) {
+                        uploadedNameItems.push(line);
+                    }
+                }
+                
+                if (uploadedNameItems.length > 0) {
+                    displayUploadedNames();
+                    showMessage(`成功解析 ${uploadedNameItems.length} 个频道名称`, 'success');
+                } else {
+                    showMessage('未找到有效的频道名称', 'error');
+                }
+            }
+            
+            // 显示上传的直播源
+            function displayUploadedSources() {
+                sourcesList.innerHTML = '';
+                uploadedSources.style.display = 'block';
+                uploadedNames.style.display = 'none'; // 隐藏名称列表
+                
+                uploadedItems.forEach((item, index) => {
+                    const sourceItem = document.createElement('div');
+                    sourceItem.className = 'source-item';
+                    sourceItem.innerHTML = `
+                        <div class="source-info">
+                            <div class="source-name">${item.name}</div>
+                            <div class="source-url">${item.url}</div>
+                        </div>
+                        <button class="btn-add" data-index="${index}"><i class="fas fa-plus"></i> 添加</button>
+                    `;
+                    
+                    sourcesList.appendChild(sourceItem);
+                });
+                
+                // 添加事件监听
+                document.querySelectorAll('.btn-add').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const index = parseInt(this.getAttribute('data-index'));
+                        const item = uploadedItems[index];
+                        
+                        // 填充到表单
+                        sourceNameSelect.value = 'custom';
+                        customNameInput.style.display = 'block';
+                        customNameField.value = item.name;
+                        sourceUrlInput.value = item.url;
+                        
+                        // 滚动到表单
+                        document.querySelectorAll('.card')[1].scrollIntoView({ behavior: 'smooth' });
+                    });
+                });
+            }
+            
+            // 显示上传的频道名称
+            function displayUploadedNames() {
+                namesList.innerHTML = '';
+                uploadedNames.style.display = 'block';
+                uploadedSources.style.display = 'none'; // 隐藏源列表
+                
+                uploadedNameItems.forEach((name, index) => {
+                    const nameItem = document.createElement('div');
+                    nameItem.className = 'source-item';
+                    nameItem.innerHTML = `
+                        <div class="source-info">
+                            <div class="source-name">${name}</div>
+                        </div>
+                        <button class="btn-select" data-index="${index}"><i class="fas fa-check"></i> 选择</button>
+                    `;
+                    
+                    namesList.appendChild(nameItem);
+                });
+                
+                // 添加事件监听
+                document.querySelectorAll('.btn-select').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const index = parseInt(this.getAttribute('data-index'));
+                        const name = uploadedNameItems[index];
+                        
+                        // 检查名称是否已存在
+                        const options = sourceNameSelect.options;
+                        let exists = false;
+                        
+                        for (let i = 0; i < options.length; i++) {
+                            if (options[i].value === name) {
+                                exists = true;
+                                break;
+                            }
+                        }
+                        
+                        // 如果不存在，添加到下拉框
+                        if (!exists) {
+                            const option = document.createElement('option');
+                            option.value = name;
+                            option.textContent = name;
+                            sourceNameSelect.insertBefore(option, sourceNameSelect.lastChild);
+                        }
+                        
+                        // 选择该名称
+                        sourceNameSelect.value = name;
+                        
+                        // 滚动到表单
+                        document.querySelectorAll('.card')[1].scrollIntoView({ behavior: 'smooth' });
+                    });
+                });
+            }
+            
+            // 关闭弹窗
+            function closeModal() {
+                customNamesModal.style.display = 'none';
+            }
+            
+            // 添加自定义名称
+            function addCustomName() {
+                const name = newCustomNameInput.value.trim();
+                
+                if (!name) {
+                    showMessage('请输入自定义名称', 'error');
+                    return;
+                }
+                
+                // 检查名称是否已存在
+                const options = sourceNameSelect.options;
+                for (let i = 0; i < options.length; i++) {
+                    if (options[i].value === name) {
+                        showMessage('该名称已存在', 'error');
+                        return;
+                    }
+                }
+                
+                // 添加到下拉框
+                const option = document.createElement('option');
+                option.value = name;
+                option.textContent = name;
+                sourceNameSelect.insertBefore(option, sourceNameSelect.lastChild);
+                
+                // 清空输入框
+                newCustomNameInput.value = '';
+                
+                showMessage(`已添加自定义名称: ${name}`, 'success');
+                showCustomNamesModal(); // 刷新列表
+            }
+            
+            // 显示自定义名称弹窗
+            function showCustomNamesModal() {
+                customNamesList.innerHTML = '';
+                
+                // 获取所有选项
+                const options = document.getElementById('sourceName').options;
+                let hasCustomNames = false;
+                
+                // 遍历选项，找出自定义名称
+                for (let i = 0; i < options.length; i++) {
+                    const option = options[i];
+                    const value = option.value;
+                    
+                    // 跳过空值、内置选项和"自定义名称"选项
+                    if (!value || value === 'custom' || builtInNames.includes(value)) {
+                        continue;
+                    }
+                    
+                    hasCustomNames = true;
+                    
+                    // 创建自定义名称项
+                    const nameItem = document.createElement('div');
+                    nameItem.className = 'custom-name-item';
+                    nameItem.innerHTML = `
+                        <div class="source-name">${value}</div>
+                        <div class="custom-name-actions">
+                            <button class="btn-delete delete-single-custom" data-value="${value}">
+                                <i class="fas fa-trash"></i> 删除
+                            </button>
+                        </div>
+                    `;
+                    
+                    customNamesList.appendChild(nameItem);
+                }
+                
+                // 如果没有自定义名称，显示提示
+                if (!hasCustomNames) {
+                    customNamesList.innerHTML = '<div class="no-custom-names">暂无自定义名称</div>';
+                    deleteAllCustomBtn.style.display = 'none';
+                } else {
+                    deleteAllCustomBtn.style.display = 'block';
+                }
+                
+                // 添加单个删除按钮的事件监听
+                document.querySelectorAll('.delete-single-custom').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const value = this.getAttribute('data-value');
+                        deleteCustomName(value);
+                    });
+                });
+                
+                // 显示弹窗
+                customNamesModal.style.display = 'flex';
+            }
+            
+            // 删除单个自定义名称
+            function deleteCustomName(value) {
+                if (builtInNames.includes(value)) {
+                    showMessage('不能删除内置名称', 'error');
+                    return;
+                }
+                
+                if (confirm(`确定要删除"${value}"吗？`)) {
+                    const select = document.getElementById('sourceName');
+                    
+                    // 查找并删除选项
+                    for (let i = 0; i < select.options.length; i++) {
+                        if (select.options[i].value === value) {
+                            select.remove(i);
+                            break;
+                        }
+                    }
+                    
+                    showMessage(`已删除自定义名称: ${value}`, 'success');
+                    showCustomNamesModal(); // 刷新列表
+                }
+            }
+            
+            // 删除所有自定义名称
+            deleteAllCustomBtn.addEventListener('click', function() {
+                if (confirm('确定要删除所有自定义名称吗？此操作不可撤销。')) {
+                    const select = document.getElementById('sourceName');
+                    let deletedCount = 0;
+                    
+                    // 从后向前遍历，避免删除时索引变化问题
+                    for (let i = select.options.length - 1; i >= 0; i--) {
+                        const value = select.options[i].value;
+                        
+                        // 跳过空值、内置选项和"自定义名称"选项
+                        if (!value || value === 'custom' || builtInNames.includes(value)) {
+                            continue;
+                        }
+                        
+                        select.remove(i);
+                        deletedCount++;
+                    }
+                    
+                    if (deletedCount > 0) {
+                        showMessage(`已删除所有自定义名称（共${deletedCount}个）`, 'success');
+                    } else {
+                        showMessage('没有可删除的自定义名称', 'error');
+                    }
+                    
+                    showCustomNamesModal(); // 刷新列表
+                }
+            });
+            
+            // 切换上传选项
+            sourceUploadOption.addEventListener('click', function() {
+                this.classList.add('active');
+                namesUploadOption.classList.remove('active');
+                sourceUploadArea.style.display = 'block';
+                namesUploadArea.style.display = 'none';
+                uploadedSources.style.display = 'none';
+                uploadedNames.style.display = 'none';
+            });
+            
+            namesUploadOption.addEventListener('click', function() {
+                this.classList.add('active');
+                sourceUploadOption.classList.remove('active');
+                namesUploadArea.style.display = 'block';
+                sourceUploadArea.style.display = 'none';
+                uploadedSources.style.display = 'none';
+                uploadedNames.style.display = 'none';
+            });
+            
+            // 上传区域点击事件
+            sourceUploadArea.addEventListener('click', function() {
+                fileInput.click();
+            });
+            
+            namesUploadArea.addEventListener('click', function() {
+                namesFileInput.click();
+            });
+            
+            // 拖放功能增强
+            function setupDragAndDrop(uploadArea, fileInput) {
+                uploadArea.addEventListener('dragover', function(e) {
+                    e.preventDefault();
+                    uploadArea.classList.add('dragover');
+                });
+                
+                uploadArea.addEventListener('dragleave', function() {
+                    uploadArea.classList.remove('dragover');
+                });
+                
+                uploadArea.addEventListener('drop', function(e) {
+                    e.preventDefault();
+                    uploadArea.classList.remove('dragover');
+                    
+                    if (e.dataTransfer.files.length > 0) {
+                        // 模拟文件输入变化
+                        const dataTransfer = new DataTransfer();
+                        dataTransfer.items.add(e.dataTransfer.files[0]);
+                        fileInput.files = dataTransfer.files;
+                        
+                        // 触发change事件
+                        const event = new Event('change', { bubbles: true });
+                        fileInput.dispatchEvent(event);
+                    }
+                });
+            }
+            
+            // 设置拖放功能
+            setupDragAndDrop(sourceUploadArea, fileInput);
+            setupDragAndDrop(namesUploadArea, namesFileInput);
+            
+            // 文件选择变化事件
+            fileInput.addEventListener('change', function() {
+                if (this.files.length > 0) {
+                    simulateUpload(this.files[0], 'source');
+                }
+            });
+            
+            namesFileInput.addEventListener('change', function() {
+                if (this.files.length > 0) {
+                    simulateUpload(this.files[0], 'names');
+                }
+            });
+            
+            // 模拟上传过程
+            function simulateUpload(file, type) {
+                const progressBar = type === 'source' ? sourceProgressBar : namesProgressBar;
+                const uploadProgress = type === 'source' ? sourceUploadProgress : namesUploadProgress;
+                const uploadStatus = type === 'source' ? sourceUploadStatus : namesUploadStatus;
+                const uploadArea = type === 'source' ? sourceUploadArea : namesUploadArea;
+                
+                // 验证文件类型
+                const validExtensions = type === 'source' ? ['.m3u', '.m3u8', '.txt'] : ['.txt'];
+                const fileExtension = '.' + file.name.split('.').pop().toLowerCase();
+                
+                if (!validExtensions.includes(fileExtension)) {
+                    showMessage(`不支持的文件类型: ${fileExtension}`, 'error');
+                    return;
+                }
+                
+                // 显示上传状态
+                uploadProgress.style.display = 'block';
+                uploadStatus.style.display = 'block';
+                uploadStatus.textContent = `正在上传: ${file.name}`;
+                uploadStatus.style.color = '#666';
+                
+                // 模拟上传进度
+                let progress = 0;
+                const interval = setInterval(() => {
+                    progress += Math.random() * 15;
+                    if (progress >= 100) {
+                        progress = 100;
+                        clearInterval(interval);
+                        
+                        // 上传完成
+                        progressBar.style.width = '100%';
+                        uploadStatus.textContent = '上传成功!';
+                        uploadStatus.style.color = '#4CAF50';
+                        
+                        // 处理文件内容
+                        setTimeout(() => {
+                            if (type === 'source') {
+                                handleFileUpload(file);
+                            } else {
+                                handleNamesFileUpload(file);
+                            }
+                            
+                            // 隐藏进度条
+                            setTimeout(() => {
+                                uploadProgress.style.display = 'none';
+                                uploadStatus.style.display = 'none';
+                                progressBar.style.width = '0%';
+                            }, 1000);
+                        }, 500);
+                    } else {
+                        progressBar.style.width = progress + '%';
+                    }
+                }, 100);
+            }
+            
+            // 事件监听
+            addButton.addEventListener('click', addSource);
+            copyButton.addEventListener('click', copyToClipboard);
+            downloadButton.addEventListener('click', downloadResults);
+            clearButton.addEventListener('click', clearSources);
+            clearFormButton.addEventListener('click', clearForm);
+            clearUploadedButton.addEventListener('click', clearUploadedSources);
+            clearNamesButton.addEventListener('click', clearUploadedNames);
+            manageCustomBtn.addEventListener('click', showCustomNamesModal);
+            closeModalBtn.addEventListener('click', closeModal);
+            closeModalButton.addEventListener('click', closeModal);
+            addCustomNameBtn.addEventListener('click', addCustomName);
+            importAllBtn.addEventListener('click', importAllSources);
+            
+            // 点击弹窗外部关闭
+            customNamesModal.addEventListener('click', function(e) {
+                if (e.target === customNamesModal) {
+                    closeModal();
+                }
+            });
+        });
+    </script>
+
+</body></html>
