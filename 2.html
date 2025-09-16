@@ -1,0 +1,617 @@
+<html lang="zh-CN"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" id="mixia_vpid">
+    <title>时光、文字与加密</title>
+    <link rel="stylesheet" href="https://unpkg.com/element-plus/dist/index.css">
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://unpkg.com/element-plus"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #6e8efb, #a777e3);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+            padding-bottom: 100px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: white;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
+        
+        .nav {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .nav-btn {
+            padding: 12px 25px;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            border-radius: 50px;
+            color: white;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .nav-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        .page {
+            display: none;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            min-height: 600px;
+        }
+        
+        .active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* 时钟页面样式 */
+        .clock-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 500px;
+        }
+        
+        .digital-clock {
+            font-size: 5rem;
+            font-weight: 700;
+            color: #6e8efb;
+            margin-bottom: 30px;
+            text-shadow: 0 2px 10px rgba(110, 142, 251, 0.3);
+        }
+        
+        .analog-clock {
+            width: 250px;
+            height: 250px;
+            border: 15px solid #6e8efb;
+            border-radius: 50%;
+            position: relative;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 25px rgba(110, 142, 251, 0.4);
+        }
+        
+        .hand {
+            position: absolute;
+            bottom: 50%;
+            left: 50%;
+            transform-origin: bottom;
+            border-radius: 10px;
+        }
+        
+        .hour-hand {
+            width: 8px;
+            height: 70px;
+            background: #333;
+            margin-left: -4px;
+        }
+        
+        .minute-hand {
+            width: 6px;
+            height: 100px;
+            background: #666;
+            margin-left: -3px;
+        }
+        
+        .second-hand {
+            width: 2px;
+            height: 110px;
+            background: #ff5252;
+            margin-left: -1px;
+        }
+        
+        .center-circle {
+            width: 20px;
+            height: 20px;
+            background: #ff5252;
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+        }
+        
+        .calendar {
+            font-size: 1.8rem;
+            color: #777;
+            text-align: center;
+        }
+        
+        /* 文章页面样式 */
+        .article-container {
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.8;
+            font-size: 1.1rem;
+        }
+        
+        .article-title {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #6e8efb;
+            font-size: 2.5rem;
+        }
+        
+        .article-content {
+            text-indent: 2em;
+            margin-bottom: 20px;
+            color: #444;
+        }
+        
+        .article-content:first-of-type:first-letter {
+            font-size: 3rem;
+            color: #6e8efb;
+            font-weight: bold;
+        }
+        
+        .article-section {
+            margin-bottom: 30px;
+        }
+        
+        .article-subtitle {
+            color: #a777e3;
+            margin: 25px 0 15px;
+            font-size: 1.5rem;
+        }
+        
+        /* 加密工具页面样式 */
+        .encrypt-wrapper {
+            padding: 20px;
+        }
+        
+        .encrypt-inner {
+            display: flex;
+            margin-top: 24px;
+            flex-wrap: wrap;
+        }
+        
+        .encrypt-textarea-group {
+            flex: 3;
+            min-width: 300px;
+        }
+        
+        .encrypt-input-group {
+            flex: 1;
+            margin: 0 24px;
+            min-width: 250px;
+        }
+        
+        .encrypt-input-group .el-input,
+        .encrypt-input-group .el-checkbox {
+            margin-bottom: 24px;
+        }
+        
+        .encrypt-input-group .btn-group {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+        
+        .encrypt-input-group .btn-group .el-button {
+            width: 120px;
+            margin-bottom: 10px;
+        }
+        
+        .encrypt-input-group .btn-group .upload {
+            margin-right: 12px;
+        }
+        
+        textarea {
+            width: 100%;
+            min-height: 300px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            resize: vertical;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+        
+        button {
+            padding: 12px 20px;
+            background: #6e8efb;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        button:hover {
+            background: #5a7de3;
+        }
+        
+        /* 底部链接样式 */
+        .footer-links {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 15px 0;
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+        }
+        
+        .footer-link {
+            color: #6e8efb;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 8px 16px;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .footer-link:hover {
+            background: rgba(110, 142, 251, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        @media (max-width: 768px) {
+            .digital-clock {
+                font-size: 3rem;
+            }
+            
+            .analog-clock {
+                width: 200px;
+                height: 200px;
+            }
+            
+            .article-title {
+                font-size: 2rem;
+            }
+            
+            .encrypt-inner {
+                flex-direction: column;
+            }
+            
+            .encrypt-input-group {
+                margin: 20px 0;
+            }
+            
+            .footer-links {
+                flex-direction: column;
+                gap: 10px;
+                padding: 10px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>时光、文字与加密</h1>
+            <p>在时间的流逝中，感受文字的魅力，保护隐私的安全</p>
+        </header>
+        
+        <div class="nav">
+            <button class="nav-btn" onclick="showPage('clock-page')">时钟与日历</button>
+            <button class="nav-btn" onclick="showPage('article-page')">优美文章</button>
+            <button class="nav-btn" onclick="showPage('encrypt-page')">加密工具</button>
+        </div>
+        
+        <div id="clock-page" class="page active">
+            <div class="clock-container">
+                <div class="digital-clock" id="digital-clock">12:59:58</div>
+                
+                <div class="analog-clock">
+                    <div class="hand hour-hand" id="hour-hand" style="transform: rotate(389.5deg);"></div>
+                    <div class="hand minute-hand" id="minute-hand" style="transform: rotate(359.8deg);"></div>
+                    <div class="hand second-hand" id="second-hand" style="transform: rotate(348deg);"></div>
+                    <div class="center-circle"></div>
+                </div>
+                
+                <div class="calendar" id="calendar">2025年9月16日 星期二</div>
+            </div>
+        </div>
+        
+        <div id="article-page" class="page">
+            <div class="article-container">
+                <h2 class="article-title">时光深处的静谧</h2>
+                
+                <div class="article-section">
+                    <p class="article-content">清晨的第一缕阳光，透过薄雾，洒在青石板上，斑驳陆离。我漫步在这古老的小巷，脚步声在寂静中回荡，仿佛是与时光的对话。这里的每一块砖，每一片瓦，都承载着岁月的痕迹，诉说着过往的故事。</p>
+                    
+                    <p class="article-content">小巷的尽头，有一棵古老的槐树，据说已有三百年的历史。它的枝叶茂盛，如同一把巨大的绿伞，为过往的行人提供荫凉。夏天，孩子们在树下嬉戏，老人们则坐在石凳上，摇着蒲扇，讲述着那些遥远的故事。</p>
+                </div>
+                
+                <h3 class="article-subtitle">四季的轮回</h3>
+                
+                <div class="article-section">
+                    <p class="article-content">春天，槐树发出新芽，嫩绿的颜色充满生机。小鸟在枝头歌唱，仿佛在庆祝冬天的结束。细雨绵绵，滋润着大地，也滋润着人们的心田。这时候，小巷里的花香四溢，各种不知名的小花竞相开放，争奇斗艳。</p>
+                    
+                    <p class="article-content">夏日，槐树的叶子变得深绿，阳光透过叶隙，在地上留下斑驳的光影。知了声声，不绝于耳，却并不让人觉得烦躁，反而有一种宁静致远的意境。夜晚，萤火虫在巷子里飞舞，如同天上的星星落入凡间。</p>
+                    
+                    <p class="article-content">秋风起时，槐树的叶子渐渐变黄，随风飘落，铺满整条小巷。踩在落叶上，发出沙沙的声响，这是秋天独有的音乐。天空变得高远，湛蓝如洗，偶尔有几朵白云飘过，如同棉絮般柔软。</p>
+                    
+                    <p class="article-content">冬雪降临，小巷披上了银装，槐树的枝干上也积满了雪，宛如玉树琼枝。孩子们在雪地里堆雪人、打雪仗，欢声笑语打破了冬日的寂静。虽然寒冷，但每个人的脸上都洋溢着温暖的笑容。</p>
+                </div>
+                
+                <h3 class="article-subtitle">时光的印记</h3>
+                
+                <div class="article-section">
+                    <p class="article-content">在这条小巷里，时间仿佛变得缓慢。现代社会的喧嚣与浮躁在这里似乎都被过滤了，只剩下宁静与祥和。我喜欢在这里散步，尤其是在黄昏时分，当夕阳的余晖洒在墙壁上，整个小巷都被染成了金黄色。</p>
+                    
+                    <p class="article-content">墙上的青苔，门上的铜环，窗棂上的雕花，无一不在诉说着历史。这些古老的元素与现代生活和谐共存，形成了一种独特的氛围。有时候，我会想象几百年前的人们是如何在这里生活的，他们的喜怒哀乐，他们的梦想与追求。</p>
+                    
+                    <p class="article-content">小巷的居民大多世代居住于此，他们彼此熟悉，互相照应。这种邻里之情在现代城市中已经越来越少见。每当有节日，小巷里总是热闹非凡，大家聚在一起，分享美食，畅谈人生，其乐融融。</p>
+                </div>
+                
+                <h3 class="article-subtitle">内心的宁静</h3>
+                
+                <div class="article-section">
+                    <p class="article-content">在这个快节奏的时代，我们常常被各种事务所困扰，内心难以平静。而这条小巷，却像是一个世外桃源，让人可以暂时逃离喧嚣，找到内心的宁静。在这里，我可以放下所有的烦恼，只是静静地感受时光的流逝。</p>
+                    
+                    <p class="article-content">有时候，我会带一本书，坐在槐树下的石凳上阅读。微风拂过，书页轻轻翻动，伴随着鸟鸣声，这是一种无比惬意的体验。阅读的间隙，我会抬头看看天空，看看周围的景色，感受大自然的美好。</p>
+                    
+                    <p class="article-content">或者，我什么也不做，只是静静地坐着，让思绪随风飘荡。这种放空的状态，反而能让灵感涌现。许多创作的灵感，都来自于这样的时刻。在这宁静的环境中，心灵得到了滋养，思维也变得清晰。</p>
+                </div>
+                
+                <h3 class="article-subtitle">永恒的瞬间</h3>
+                
+                <div class="article-section">
+                    <p class="article-content">生命中有许多瞬间，看似平凡，却值得珍藏。在这条小巷里，我经历了许多这样的瞬间：雨后彩虹的出现，槐花盛开时的芬芳，孩子们天真的笑脸，老人们慈祥的目光……这些瞬间，如同珍珠般串成了生命的项链。</p>
+                    
+                    <p class="article-content">时光荏苒，岁月如梭。无论世界如何变化，这条小巷依然保持着它的风貌，静静地存在于城市的一角。它见证了历史的变迁，也见证了一代又一代人的成长。在这里，过去与现在交织，传统与现代融合，形成了一种独特的文化景观。</p>
+                    
+                    <p class="article-content">每当我离开小巷，回到喧嚣的城市中，我总会带着一份宁静与力量。这条小巷教会了我如何在这个浮躁的世界中保持内心的平静，如何欣赏生活中的美好，如何珍惜那些看似平凡却珍贵的瞬间。</p>
+                    
+                    <p class="article-content">时光深处的静谧，不仅存在于这条小巷，更存在于每个人的心中。只要我们愿意停下匆忙的脚步，用心去感受，就能发现生活中的美好，找到内心的宁静。这或许就是这条小巷给我的最大启示。</p>
+                </div>
+            </div>
+        </div>
+        
+        <div id="encrypt-page" class="page" data-v-app=""><div class="encrypt-wrapper"><h2>TVBox的AES-128-CBC加密</h2><div class="encrypt-inner"><div class="encrypt-textarea-group"><textarea placeholder="请输入要加密或解密的内容"></textarea></div><div class="encrypt-input-group"><select><option value="1">加密</option><option value="0">解密</option></select><input maxlength="16" type="text" placeholder="KEY/密码"><input maxlength="13" type="text" placeholder="IV/向量" disabled=""><div class="btn-group"><button>上传文件</button><input type="file" id="fileUpload" style="display: none;"><button>加密下载</button></div></div><div class="encrypt-textarea-group"><textarea placeholder="结果将显示在这里"></textarea></div></div></div></div>
+    </div>
+
+    <!-- 底部链接 -->
+    <div class="footer-links">
+        <a href="./TXT.html" class="footer-link" target="_blank">直播源格式转换</a>
+        <a href="./pl.html" class="footer-link" target="_blank">批量制作工具</a>
+        <a href="./zby.html" class="footer-link" target="_blank">直播源管理工具</a>
+        <a href="./jm.html" class="footer-link" target="_blank">点播播源解密工具</a>
+    </div>
+
+    <script>
+        // 页面切换功能
+        function showPage(pageId) {
+            // 隐藏所有页面
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            
+            // 显示选中的页面
+            document.getElementById(pageId).classList.add('active');
+        }
+        
+        // 时钟功能
+        function updateClock() {
+            const now = new Date();
+            
+            // 更新数字时钟
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            document.getElementById('digital-clock').textContent = `${hours}:${minutes}:${seconds}`;
+            
+            // 更新模拟时钟
+            const secondDegrees = (now.getSeconds() / 60) * 360;
+            const minuteDegrees = (now.getMinutes() / 60) * 360 + (now.getSeconds() / 60) * 6;
+            const hourDegrees = (now.getHours() / 12) * 360 + (now.getMinutes() / 60) * 30;
+            
+            document.getElementById('second-hand').style.transform = `rotate(${secondDegrees}deg)`;
+            document.getElementById('minute-hand').style.transform = `rotate(${minuteDegrees}deg)`;
+            document.getElementById('hour-hand').style.transform = `rotate(${hourDegrees}deg)`;
+            
+            // 更新日历
+            const year = now.getFullYear();
+            const month = now.getMonth() + 1;
+            const day = now.getDate();
+            const weekdays = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
+            const weekday = weekdays[now.getDay()];
+            
+            document.getElementById('calendar').textContent = `${year}年${month}月${day}日 ${weekday}`;
+        }
+        
+        // 初始化时钟并设置定时器
+        updateClock();
+        setInterval(updateClock, 1000);
+        
+        // Vue应用 - 加密工具
+        const { createApp, ref } = Vue;
+        
+        function padTo16Byte(str) {
+            return CryptoJS.enc.Utf8.parse(str.toString().padEnd(16, '0'));
+        }
+        
+        function Encrypt(word, keyStr, ivStr) {
+            const key = padTo16Byte(keyStr);
+            const iv = padTo16Byte(ivStr);
+            const encrypted = CryptoJS.AES.encrypt(word, key, { iv });
+            return encrypted.ciphertext.toString(CryptoJS.enc.Hex);
+        }
+        
+        function Decrypt(word, keyStr, ivStr) {
+            const key = padTo16Byte(keyStr);
+            const iv = padTo16Byte(ivStr);
+            const ciphertext = CryptoJS.enc.Hex.parse(word);
+            const decrypt = CryptoJS.AES.decrypt({ ciphertext }, key, { iv });
+            return decrypt.toString(CryptoJS.enc.Utf8);
+        }
+        
+        function decryptAesBCB(encryptedData) {
+            var dataArr = encryptedData.split("");
+            var prefixCode = CryptoJS.enc.Utf8.parse("$#").toString();
+            var suffixCode = CryptoJS.enc.Utf8.parse("#$").toString();
+            var pwdMix = dataArr
+                .splice(0, encryptedData.indexOf(suffixCode) + 4)
+                .join("");
+            var roundtimeInHax = dataArr.splice(dataArr.length - 26, 26).join("");
+            var encryptedText = dataArr.join("");
+            var pwdInHax = pwdMix.substring(
+                prefixCode.length,
+                pwdMix.length - suffixCode.length
+            );
+            var roundTime = CryptoJS.enc.Utf8.stringify(
+                CryptoJS.enc.Hex.parse(roundtimeInHax)
+            );
+            var pwd = CryptoJS.enc.Utf8.stringify(CryptoJS.enc.Hex.parse(pwdInHax));
+            var iv = CryptoJS.enc.Utf8.parse(roundTime.padEnd(16, "0"));
+            var pkBlocks = CryptoJS.enc.Utf8.parse(pwd.padEnd(16, "0"));
+            var cipherParams = CryptoJS.lib.CipherParams.create({
+                ciphertext: CryptoJS.enc.Hex.parse(encryptedText),
+            });
+            var decryptedData = CryptoJS.enc.Utf8.stringify(
+                CryptoJS.AES.decrypt(cipherParams, pkBlocks, {
+                    iv: iv,
+                    mode: CryptoJS.mode.CBC,
+                    padding: CryptoJS.pad.Pkcs7,
+                })
+            );
+            return decryptedData;
+        }
+        
+        function convertToHex(value) {
+            return CryptoJS.enc.Hex.stringify(CryptoJS.enc.Utf8.parse(value));
+        }
+        
+        function convertToString(value) {
+            return CryptoJS.enc.Utf8.stringify(CryptoJS.enc.Hex.parse(value));
+        }
+        
+        createApp({
+            setup() {
+                const jsonData = ref("");
+                const key = ref("123456");
+                const iv = ref(new Date().getTime());
+                const result = ref("");
+                const selectValue = ref("1");
+                
+                const encryptAes = async () => {
+                    if (!jsonData.value) {
+                        alert("请输入要加密的内容");
+                        return;
+                    }
+
+                    try {
+                        const resultData = Encrypt(jsonData.value, key.value, iv.value);
+                        const keyHex = convertToHex(`$#${key.value}#$`);
+                        const ivHex = convertToHex(iv.value);
+                        result.value = `${keyHex}${resultData}${ivHex}`;
+                        downloadFile(result.value);
+                    } catch (err) {
+                        console.error(err);
+                        result.value = "加密失败: " + err.message;
+                    }
+                };
+
+                const decryptAes = async () => {
+                    if (!jsonData.value) {
+                        alert("请输入要解密的内容");
+                        return;
+                    }
+                    try {
+                        const resultData = decryptAesBCB(jsonData.value);
+                        result.value = resultData;
+                    } catch (err) {
+                        console.error(err);
+                        result.value = "解密失败: " + err.message;
+                    }
+                };
+
+                const handleUploadClick = () => {
+                    document.getElementById('fileUpload').click();
+                };
+
+                const handleFileUpload = (event) => {
+                    const file = event.target.files[0];
+                    if (!file) return;
+                    
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        jsonData.value = e.target.result;
+                    };
+                    reader.readAsText(file);
+                };
+
+                const downloadFile = (dataStr) => {
+                    const blob = new Blob([dataStr], { type: "text/plain" });
+                    const url = URL.createObjectURL(blob);
+                    const link = document.createElement("a");
+                    link.href = url;
+                    link.download = "file.txt";
+                    link.click();
+                    URL.revokeObjectURL(url);
+                };
+
+                return {
+                    jsonData,
+                    key,
+                    iv,
+                    result,
+                    selectValue,
+                    encryptAes,
+                    decryptAes,
+                    handleUploadClick,
+                    handleFileUpload
+                };
+            }
+        }).mount('#encrypt-page');
+    </script>
+
+</body></html>
