@@ -1,0 +1,600 @@
+<html lang="zh-CN"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" id="mixia_vpid">
+    <title>AES-128-CBC加密解密工具</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f7fa;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #2c3e50;
+            font-size: 1.5rem;
+        }
+        .tool-description {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+        .wrapper {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .textarea-group {
+            flex: 1;
+            min-width: 280px;
+        }
+        .input-group {
+            flex: 0 0 280px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .textarea-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .textarea-header h3 {
+            font-size: 0.95rem;
+            color: #34495e;
+        }
+        .textarea-header span {
+            font-size: 0.8rem;
+            color: #7f8c8d;
+        }
+        textarea {
+            width: 100%;
+            min-height: 250px;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 0.9rem;
+            resize: vertical;
+        }
+        textarea:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+        }
+        .control-item {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        label {
+            font-weight: 500;
+            color: #2c3e50;
+            font-size: 0.9rem;
+        }
+        select, input {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            height: 42px;
+        }
+        select:focus, input:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+        }
+        .btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        button {
+            padding: 10px 12px;
+            border: none;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            height: 42px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        .btn-encrypt {
+            background-color: #2ecc71;
+            color: white;
+        }
+        .btn-encrypt:hover:not(:disabled) {
+            background-color: #27ae60;
+        }
+        .btn-decrypt {
+            background-color: #3498db;
+            color: white;
+        }
+        .btn-decrypt:hover:not(:disabled) {
+            background-color: #2980b9;
+        }
+        .btn-file {
+            background-color: #9b59b6;
+            color: white;
+        }
+        .btn-file:hover:not(:disabled) {
+            background-color: #8e44ad;
+        }
+        .btn-convert {
+            background-color: #e67e22;
+            color: white;
+        }
+        .btn-convert:hover:not(:disabled) {
+            background-color: #d35400;
+        }
+        .btn-download {
+            background-color: #1abc9c;
+            color: white;
+        }
+        .btn-download:hover:not(:disabled) {
+            background-color: #16a085;
+        }
+        .file-input {
+            display: none;
+        }
+        .status {
+            margin-top: 15px;
+            padding: 8px 12px;
+            border-radius: 4px;
+            text-align: center;
+            font-size: 0.85rem;
+        }
+        .status.success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .status.error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 992px) {
+            .container {
+                padding: 15px;
+            }
+            .wrapper {
+                gap: 15px;
+            }
+            .input-group {
+                flex: 0 0 250px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            .container {
+                padding: 15px;
+                border-radius: 6px;
+            }
+            h1 {
+                font-size: 1.3rem;
+                margin-bottom: 15px;
+            }
+            .wrapper {
+                flex-direction: column;
+            }
+            .input-group {
+                flex: 1;
+                order: 3;
+            }
+            .textarea-group:first-child {
+                order: 1;
+            }
+            .textarea-group:last-child {
+                order: 2;
+            }
+            textarea {
+                min-height: 200px;
+            }
+            .btn-group {
+                flex-direction: row;
+                flex-wrap: wrap;
+            }
+            .btn-group button {
+                flex: 1;
+                min-width: 120px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.2rem;
+            }
+            .tool-description {
+                font-size: 0.85rem;
+            }
+            .textarea-header h3 {
+                font-size: 0.9rem;
+            }
+            textarea {
+                min-height: 150px;
+                font-size: 0.85rem;
+                padding: 10px;
+            }
+            .input-group {
+                gap: 12px;
+            }
+            .control-item {
+                gap: 5px;
+            }
+            label {
+                font-size: 0.85rem;
+            }
+            select, input {
+                height: 38px;
+                font-size: 0.85rem;
+                padding: 8px 10px;
+            }
+            button {
+                height: 38px;
+                font-size: 0.85rem;
+                padding: 8px 10px;
+            }
+            .btn-group {
+                flex-direction: column;
+            }
+            .btn-group button {
+                min-width: auto;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="app" class="container" data-v-app=""><h1>AES-128-CBC加密解密工具</h1><p class="tool-description">用于TVBox配置的AES-128-CBC加密和解密操作</p><div class="wrapper"><div class="textarea-group"><div class="textarea-header"><h3>输入内容</h3><span>0 字符</span></div><textarea placeholder="请输入要加密或解密的文本..."></textarea></div><div class="input-group"><div class="control-item"><label for="operation">操作类型</label><select id="operation"><option value="encrypt">加密</option><option value="decrypt">解密</option></select></div><div class="control-item"><label for="key">密钥 (KEY)</label><input id="key" type="text" placeholder="请输入16位密钥" maxlength="16"></div><div class="control-item"><label for="iv">初始向量 (IV)</label><input id="iv" type="text" placeholder="自动生成时间戳" disabled=""></div><div class="btn-group"><button class="btn-file">上传文件</button><input type="file" class="file-input"><button class="btn-encrypt" disabled="">加密</button><button class="btn-convert" disabled=""> 配置转图片 </button></div><!--v-if--></div><div class="textarea-group"><div class="textarea-header"><h3>输出结果</h3><span>0 字符</span></div><textarea placeholder="结果将显示在这里..." readonly=""></textarea><div class="btn-group" style="margin-top: 10px;"><button class="btn-download" disabled=""> 下载文本 </button><button class="btn-download" disabled=""> 下载为图片 </button></div></div></div></div>
+
+    <script>
+        const { createApp, ref, computed, watch } = Vue;
+        
+        // 辅助函数：填充到16字节
+        function padTo16Byte(str) {
+            return CryptoJS.enc.Utf8.parse(str.toString().padEnd(16, '0'));
+        }
+        
+        // AES加密函数
+        function encryptAES(word, keyStr, ivStr) {
+            const key = padTo16Byte(keyStr);
+            const iv = padTo16Byte(ivStr);
+            const encrypted = CryptoJS.AES.encrypt(word, key, { iv: iv });
+            return encrypted.ciphertext.toString(CryptoJS.enc.Hex);
+        }
+        
+        // AES解密函数
+        function decryptAES(word, keyStr, ivStr) {
+            const key = padTo16Byte(keyStr);
+            const iv = padTo16Byte(ivStr);
+            const ciphertext = CryptoJS.enc.Hex.parse(word);
+            const decrypt = CryptoJS.AES.decrypt({ ciphertext: ciphertext }, key, { iv: iv });
+            return decrypt.toString(CryptoJS.enc.Utf8);
+        }
+        
+        // 复杂解密函数（用于TVBox格式）
+        function decryptAesBCB(encryptedData) {
+            try {
+                const dataArr = encryptedData.split("");
+                const prefixCode = CryptoJS.enc.Utf8.parse("$#").toString();
+                const suffixCode = CryptoJS.enc.Utf8.parse("#$").toString();
+                
+                const pwdMix = dataArr.splice(0, encryptedData.indexOf(suffixCode) + 4).join("");
+                const roundtimeInHex = dataArr.splice(dataArr.length - 26, 26).join("");
+                const encryptedText = dataArr.join("");
+                
+                const pwdInHex = pwdMix.substring(prefixCode.length, pwdMix.length - suffixCode.length);
+                const roundTime = CryptoJS.enc.Utf8.stringify(CryptoJS.enc.Hex.parse(roundtimeInHex));
+                const pwd = CryptoJS.enc.Utf8.stringify(CryptoJS.enc.Hex.parse(pwdInHex));
+                
+                const iv = CryptoJS.enc.Utf8.parse(roundTime.padEnd(16, "0"));
+                const pkBlocks = CryptoJS.enc.Utf8.parse(pwd.padEnd(16, "0"));
+                
+                const cipherParams = CryptoJS.lib.CipherParams.create({
+                    ciphertext: CryptoJS.enc.Hex.parse(encryptedText)
+                });
+                
+                const decryptedData = CryptoJS.enc.Utf8.stringify(
+                    CryptoJS.AES.decrypt(cipherParams, pkBlocks, {
+                        iv: iv,
+                        mode: CryptoJS.mode.CBC,
+                        padding: CryptoJS.pad.Pkcs7
+                    })
+                );
+                
+                return decryptedData;
+            } catch (error) {
+                throw new Error("解密失败: " + error.message);
+            }
+        }
+        
+        // 字符串转Hex
+        function convertToHex(value) {
+            return CryptoJS.enc.Hex.stringify(CryptoJS.enc.Utf8.parse(value));
+        }
+        
+        // 文本转图片功能
+        function textToImage(text, width = 800, height = 600) {
+            return new Promise((resolve) => {
+                // 创建一个canvas元素
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                
+                // 设置canvas尺寸
+                canvas.width = width;
+                canvas.height = height;
+                
+                // 填充背景
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(0, 0, width, height);
+                
+                // 设置文本样式
+                ctx.fillStyle = '#000000';
+                ctx.font = '16px monospace';
+                ctx.textBaseline = 'top';
+                
+                // 计算文本行数和每行字符数
+                const lineHeight = 20;
+                const charsPerLine = Math.floor((width - 40) / 9.6); // 估算每行字符数
+                const lines = [];
+                
+                // 分割文本为多行
+                for (let i = 0; i < text.length; i += charsPerLine) {
+                    lines.push(text.substring(i, i + charsPerLine));
+                }
+                
+                // 绘制文本
+                const startY = 20;
+                lines.forEach((line, index) => {
+                    ctx.fillText(line, 20, startY + index * lineHeight);
+                });
+                
+                // 将canvas转换为图片
+                const image = new Image();
+                image.onload = function() {
+                    resolve(image);
+                };
+                image.src = canvas.toDataURL('image/png');
+            });
+        }
+        
+        createApp({
+            setup() {
+                const inputText = ref("");
+                const outputText = ref("");
+                const key = ref("123456");
+                const iv = ref("1757655263861");
+                const operation = ref("encrypt");
+                const statusMessage = ref("");
+                const statusType = ref("");
+                const fileInput = ref(null);
+                
+                // 计算字符数
+                const inputCharCount = computed(() => inputText.value.length);
+                const outputCharCount = computed(() => outputText.value.length);
+                
+                // 加密函数
+                const encrypt = () => {
+                    try {
+                        statusMessage.value = "";
+                        
+                        if (!inputText.value) {
+                            showStatus("请输入要处理的内容", "error");
+                            return;
+                        }
+                        
+                        if (!key.value) {
+                            showStatus("请输入密钥", "error");
+                            return;
+                        }
+                        
+                        if (operation.value === "encrypt") {
+                            // 加密操作
+                            const resultData = encryptAES(inputText.value, key.value, iv.value);
+                            const keyHex = convertToHex(`$#${key.value}#$`);
+                            const ivHex = convertToHex(iv.value);
+                            outputText.value = `${keyHex}${resultData}${ivHex}`;
+                            showStatus("加密成功", "success");
+                        } else {
+                            // 解密操作
+                            outputText.value = decryptAesBCB(inputText.value);
+                            showStatus("解密成功", "success");
+                        }
+                    } catch (error) {
+                        showStatus("处理失败: " + error.message, "error");
+                        console.error(error);
+                    }
+                };
+                
+                // 显示状态消息
+                const showStatus = (message, type) => {
+                    statusMessage.value = message;
+                    statusType.value = type;
+                    
+                    // 3秒后清除状态消息
+                    setTimeout(() => {
+                        statusMessage.value = "";
+                    }, 3000);
+                };
+                
+                // 触发文件上传
+                const triggerFileUpload = () => {
+                    fileInput.value.click();
+                };
+                
+                // 处理文件上传
+                const handleFileUpload = (event) => {
+                    const file = event.target.files[0];
+                    if (!file) return;
+                    
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        inputText.value = e.target.result;
+                        showStatus("文件加载成功", "success");
+                    };
+                    reader.onerror = () => {
+                        showStatus("文件读取失败", "error");
+                    };
+                    reader.readAsText(file);
+                };
+                
+                // 下载文本文件
+                const downloadText = () => {
+                    if (!outputText.value) {
+                        showStatus("没有内容可下载", "error");
+                        return;
+                    }
+                    
+                    try {
+                        const blob = new Blob([outputText.value], { type: 'text/plain' });
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        
+                        // 根据操作类型设置文件名
+                        const prefix = operation.value === 'encrypt' ? 'encrypted' : 'decrypted';
+                        a.download = `${prefix}_result.txt`;
+                        
+                        document.body.appendChild(a);
+                        a.click();
+                        
+                        // 清理
+                        setTimeout(() => {
+                            document.body.removeChild(a);
+                            URL.revokeObjectURL(url);
+                        }, 100);
+                        
+                        showStatus("文本下载成功", "success");
+                    } catch (error) {
+                        showStatus("下载失败: " + error.message, "error");
+                    }
+                };
+                
+                // 下载为图片
+                const downloadAsImage = async () => {
+                    if (!outputText.value) {
+                        showStatus("没有内容可下载", "error");
+                        return;
+                    }
+                    
+                    try {
+                        showStatus("正在生成图片...", "success");
+                        
+                        const image = await textToImage(outputText.value);
+                        
+                        // 创建下载链接
+                        const a = document.createElement('a');
+                        a.href = image.src;
+                        
+                        // 根据操作类型设置文件名
+                        const prefix = operation.value === 'encrypt' ? 'encrypted' : 'decrypted';
+                        a.download = `${prefix}_result.png`;
+                        
+                        document.body.appendChild(a);
+                        a.click();
+                        
+                        // 清理
+                        setTimeout(() => {
+                            document.body.removeChild(a);
+                        }, 100);
+                        
+                        showStatus("图片下载成功", "success");
+                    } catch (error) {
+                        showStatus("图片生成失败: " + error.message, "error");
+                    }
+                };
+                
+                // 配置转图片功能
+                const convertToImage = async () => {
+                    if (!inputText.value) {
+                        showStatus("请输入要转换的配置内容", "error");
+                        return;
+                    }
+                    
+                    try {
+                        showStatus("正在生成配置图片...", "success");
+                        
+                        const image = await textToImage(inputText.value);
+                        
+                        // 创建下载链接
+                        const a = document.createElement('a');
+                        a.href = image.src;
+                        a.download = 'configuration.png';
+                        
+                        document.body.appendChild(a);
+                        a.click();
+                        
+                        // 清理
+                        setTimeout(() => {
+                            document.body.removeChild(a);
+                        }, 100);
+                        
+                        showStatus("配置图片生成成功", "success");
+                    } catch (error) {
+                        showStatus("图片生成失败: " + error.message, "error");
+                    }
+                };
+                
+                // 监听操作类型变化
+                watch(operation, (newValue) => {
+                    if (newValue === "decrypt") {
+                        iv.value = "解密时自动提取";
+                    } else {
+                        iv.value = "1757655263861";
+                    }
+                });
+                
+                return {
+                    inputText,
+                    outputText,
+                    key,
+                    iv,
+                    operation,
+                    statusMessage,
+                    statusType,
+                    fileInput,
+                    inputCharCount,
+                    outputCharCount,
+                    encrypt,
+                    triggerFileUpload,
+                    handleFileUpload,
+                    downloadText,
+                    downloadAsImage,
+                    convertToImage
+                };
+            }
+        }).mount('#app');
+    </script>
+
+</body></html>
