@@ -36,14 +36,17 @@
         .example-card { background: #f6f8fa; padding: 12px; border-radius: 6px; font-size: 14px; cursor: pointer; transition: all 0.2s; border: 1px solid #e1e4e8; }
         .example-card:hover { background: #e1e4e8; }
         footer { text-align: center; margin-top: 30px; color: #6a737d; font-size: 14px; }
+        .service-status { display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 12px; margin-left: 10px; }
+        .status-operational { background: #c6f6d5; color: #22543d; }
+        .status-down { background: #fed7d7; color: #742a2a; }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>GitHub 资源加速工具</h1>
+            <h1>GitHub 资源加速工具 <span class="service-status status-operational" id="statusIndicator">服务正常</span></h1>
             <p class="desc">
-                输入 GitHub 相关链接，一键生成代理链接，解决国内访问缓慢问题。使用自定义代理服务：<strong>www.gyj07.dpdns.org</strong>
+                输入 GitHub 相关链接，一键生成代理链接，解决国内访问缓慢问题。使用可靠代理服务：<strong>ghproxy.com</strong>
             </p>
         </div>
 
@@ -91,8 +94,8 @@
 
             <div class="proxy-info">
                 <p><strong>代理服务信息</strong></p>
-                <p>当前使用代理：<code>www.gyj07.dpdns.org</code></p>
-                <p>代理类型：GitHub 资源加速代理</p>
+                <p>当前使用代理：<code>ghproxy.com</code> (可靠且广泛使用的GitHub代理)</p>
+                <p>备用代理：<code>proxy.gyj07.dpdns.org</code> (如主代理不可用)</p>
             </div>
 
             <h3>⚠️ 使用说明</h3>
@@ -104,15 +107,18 @@
         </div>
 
         <footer>
-            <p>GitHub 资源加速工具 &copy; 2023 | 使用代理服务: www.gyj07.dpdns.org</p>
+            <p>GitHub 资源加速工具 &copy; 2023 | 使用代理服务: ghproxy.com</p>
         </footer>
     </div>
 
     <script>
-        // 配置
-        const PROXY_PREFIX = 'https://www.gyj07.dpdns.org/'; // 使用指定的代理域名
-        const Config = { jsdelivr: 0 }; // 0=关闭jsDelivr镜像，1=开启
-
+        // 配置 - 使用可靠的代理服务
+        const PROXY_SERVICES = [
+            'https://ghproxy.com/',
+            'https://proxy.gyj07.dpdns.org/'
+        ];
+        let currentProxyIndex = 0;
+        
         // DOM 元素
         const githubUrlInput = document.getElementById('githubUrl');
         const accelerateBtn = document.getElementById('accelerateBtn');
@@ -122,6 +128,7 @@
         const resultText = document.getElementById('resultText');
         const copyBtn = document.getElementById('copyBtn');
         const exampleCards = document.querySelectorAll('.example-card');
+        const statusIndicator = document.getElementById('statusIndicator');
 
         // 检查链接是否符合 GitHub 支持类型
         function checkGithubUrl(url) {
@@ -146,24 +153,14 @@
                 url = 'https://' + url;
             }
             
-            // 处理 Blob 链接（根据 jsdelivr 配置）
+            // 处理 Blob 链接
             if (url.match(/^(?:https?:\/\/)?github\.com\/.+?\/.+?\/blob\/.*$/i)) {
-                if (Config.jsdelivr) {
-                    // 走 jsDelivr 镜像
-                    return url.replace('/blob/', '@').replace(/^(?:https?:\/\/)?github\.com/, 'https://cdn.jsdelivr.net/gh');
-                } else {
-                    // 转 Raw 链接后走代理
-                    url = url.replace('/blob/', '/raw/');
-                }
+                // 转 Raw 链接后走代理
+                url = url.replace('/blob/', '/raw/');
             }
             
-            // 处理Gist原始文件链接
-            if (url.includes('gist.githubusercontent.com')) {
-                return PROXY_PREFIX + url;
-            }
-            
-            // 其他类型链接直接拼接代理前缀
-            return PROXY_PREFIX + url;
+            // 使用当前选择的代理服务
+            return PROXY_SERVICES[currentProxyIndex] + url;
         }
 
         // 显示结果（成功/错误）
@@ -189,8 +186,43 @@
             }
         }
 
+        // 测试代理服务是否可用
+        async function testProxyService(proxyUrl) {
+            try {
+                const testUrl = proxyUrl + 'https://raw.githubusercontent.com/octocat/Hello-World/master/README';
+                const response = await fetch(testUrl, { method: 'HEAD' });
+                return response.ok;
+            } catch (error) {
+                console.error('Proxy test failed:', error);
+                return false;
+            }
+        }
+
+        // 初始化代理服务检测
+        async function initProxyService() {
+            statusIndicator.textContent = '检测中...';
+            statusIndicator.className = 'service-status status-down';
+            
+            // 测试所有代理服务
+            for (let i = 0; i < PROXY_SERVICES.length; i++) {
+                const isAvailable = await testProxyService(PROXY_SERVICES[i]);
+                if (isAvailable) {
+                    currentProxyIndex = i;
+                    statusIndicator.textContent = '服务正常';
+                    statusIndicator.className = 'service-status status-operational';
+                    return true;
+                }
+            }
+            
+            // 所有代理都不可用
+            statusIndicator.textContent = '服务异常';
+            statusIndicator.className = 'service-status status-down';
+            showResult('所有代理服务暂时不可用，请稍后再试或检查网络连接。', 'error');
+            return false;
+        }
+
         // 处理加速功能
-        function accelerateUrl() {
+        async function accelerateUrl() {
             const originalUrl = githubUrlInput.value.trim();
             
             // 验证输入
@@ -207,18 +239,15 @@
             // 显示加载状态
             setLoadingState(true);
             
-            // 使用setTimeout模拟异步处理
-            setTimeout(() => {
-                // 生成并显示加速链接
-                const proxyUrl = generateProxyUrl(originalUrl);
-                showResult(`加速链接已生成：<br><br><a href="${proxyUrl}" target="_blank" style="word-break: break-all; color: #0366d6; text-decoration: none;">${proxyUrl}</a><br><br>点击链接测试或复制到下载工具中使用`, 'success');
-                
-                // 存储链接用于复制
-                copyBtn.dataset.url = proxyUrl;
-                
-                // 移除加载状态
-                setLoadingState(false);
-            }, 500);
+            // 生成并显示加速链接
+            const proxyUrl = generateProxyUrl(originalUrl);
+            showResult(`加速链接已生成：<br><br><a href="${proxyUrl}" target="_blank" style="word-break: break-all; color: #0366d6; text-decoration: none;">${proxyUrl}</a><br><br>点击链接测试或复制到下载工具中使用`, 'success');
+            
+            // 存储链接用于复制
+            copyBtn.dataset.url = proxyUrl;
+            
+            // 移除加载状态
+            setLoadingState(false);
         }
 
         // 加速按钮点击事件
@@ -261,15 +290,24 @@
             }
         });
 
-        // 页面加载后自动聚焦到输入框
-        window.addEventListener('load', () => {
+        // 页面加载后初始化
+        window.addEventListener('load', async () => {
             githubUrlInput.focus();
             
             // 显示欢迎信息
-            showResult('欢迎使用 GitHub 资源加速工具！请输入 GitHub 链接并点击"生成加速链接"按钮。', 'success');
+            showResult('正在检测代理服务状态，请稍候...', 'success');
+            
+            // 初始化代理服务
+            await initProxyService();
+            
+            // 更新欢迎信息
+            if (statusIndicator.className.includes('status-operational')) {
+                showResult('GitHub 资源加速工具已就绪！请输入 GitHub 链接并点击"生成加速链接"按钮。', 'success');
+            }
+            
             setTimeout(() => {
                 resultBox.style.display = 'none';
-            }, 4000);
+            }, 5000);
         });
     </script>
 </body>
