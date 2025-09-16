@@ -1,0 +1,697 @@
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" id="mixia_vpid">
+    <title>多功能网站</title>
+    <style>
+        /* 全局样式 - 极简清爽风 */
+        body {
+            font-family: 'Microsoft YaHei', 'Roboto', sans-serif;
+            background-color: #f9fafb; /* 超浅灰底，更显通透 */
+            margin: 0;
+            padding: 0;
+            color: #374151;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            line-height: 1.5;
+        }
+        
+        /* 导航栏 - 简化且突出交互 */
+        nav {
+            background-color: #4285f4;
+            padding: 10px 0;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.08); /* 更淡阴影，减少压迫感 */
+        }
+        
+        nav ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 5px; /* 移动端适配间距 */
+        }
+        
+        nav li {
+            margin: 0 12px;
+        }
+        
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-size: 15px;
+            padding: 7px 12px;
+            border-radius: 4px;
+            transition: all 0.2s ease; /* 更流畅过渡 */
+            display: inline-block; /* 确保点击区域完整 */
+        }
+        
+        nav a:hover, nav a:active {
+            background-color: #3367d6;
+            transform: translateY(-1px); /* 轻微上浮，增强交互感 */
+        }
+        
+        /* 内容容器 - 留白优化 */
+        .container {
+            max-width: 1000px;
+            margin: 20px auto;
+            padding: 22px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 0 6px rgba(0,0,0,0.04);
+            flex: 1;
+        }
+        
+        h1 {
+            color: #4285f4;
+            text-align: center;
+            margin-bottom: 22px;
+            font-size: 22px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+        
+        h2 {
+            color: #4b5563;
+            font-size: 17px;
+            font-weight: 600;
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+        
+        /* 主页时钟日历 - 轻量化布局 */
+        .clock-calendar {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+        
+        .clock-container, .calendar-container {
+            background: #fff;
+            padding: 18px;
+            border-radius: 8px;
+            box-shadow: 0 0 4px rgba(0,0,0,0.02);
+            min-width: 260px;
+            text-align: center;
+            border: 1px solid #f3f4f6; /* 细边框增强层次感 */
+        }
+        
+        #clock {
+            font-size: 38px;
+            text-align: center;
+            color: #4285f4;
+            font-weight: 600;
+            margin: 8px 0;
+            letter-spacing: 1px;
+        }
+        
+        #date {
+            font-size: 18px;
+            text-align: center;
+            color: #6b7280;
+            margin-top: 5px;
+        }
+        
+        .calendar {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 8px;
+        }
+        
+        .calendar th, .calendar td {
+            border: 1px solid #f0f0f0;
+            padding: 7px 4px;
+            text-align: center;
+            font-size: 13px;
+        }
+        
+        .calendar th {
+            background-color: #f8fafc;
+            color: #64748b;
+            font-weight: 500;
+        }
+        
+        .calendar td {
+            transition: background-color 0.2s;
+        }
+        
+        .calendar td:hover {
+            background-color: #f1f5f9;
+        }
+        
+        .today {
+            background-color: #4285f4;
+            color: white;
+            border-radius: 50%;
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            line-height: 24px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+        
+        /* 页面切换 - 基础样式保留 */
+        .page {
+            display: none;
+        }
+        
+        .active {
+            display: block;
+            animation: fadeIn 0.3s ease; /* 淡入动画，增强切换体验 */
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        /* 底部链接 - 修复点击区域+优化交互 */
+        .footer-links {
+            background-color: #4285f4;
+            padding: 14px 0;
+            text-align: center;
+            margin-top: 25px;
+            box-shadow: 0 -1px 2px rgba(0,0,0,0.05);
+        }
+        
+        .footer-links a {
+            color: white;
+            text-decoration: none;
+            margin: 0 10px;
+            font-size: 13px;
+            transition: all 0.2s;
+            padding: 5px 8px; /* 扩大点击区域，修复点击无响应 */
+            display: inline-block; /* 确保padding生效，点击区域完整 */
+            position: relative;
+        }
+        
+        .footer-links a:hover {
+            color: #e8f0fe;
+            text-decoration: underline;
+            transform: translateY(-1px);
+        }
+        
+        .footer-links a::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #1f2937; /* 更深背景，提升可读性 */
+            color: white;
+            padding: 4px 8px;
+            border-radius: 3px;
+            font-size: 12px;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.2s;
+            z-index: 10; /* 确保tooltip不被遮挡 */
+        }
+        
+        .footer-links a:hover::after {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .copyright {
+            text-align: center;
+            padding: 11px 0;
+            background-color: #f8fafc;
+            color: #64748b;
+            font-size: 12px;
+            border-top: 1px solid #f0f0f0;
+        }
+        
+        /* 链接生成器 - 表单轻量化 */
+        .alert {
+            border-radius: 6px;
+            padding: 11px 14px;
+            margin-bottom: 18px;
+            font-size: 13px;
+            border: 1px solid transparent;
+        }
+        
+        .alert-success {
+            background-color: #ecfdf5;
+            color: #065f46;
+            border-color: #d1fae5;
+        }
+        
+        .alert-warning {
+            background-color: #fffbeb;
+            color: #7c2d12;
+            border-color: #fef3c7;
+            margin-top: 22px;
+        }
+        
+        .alert-info {
+            background-color: #eff6ff;
+            color: #0369a1;
+            border-color: #dbeafe;
+            line-height: 1.5;
+        }
+        
+        .table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+        
+        .table td {
+            padding: 9px 0;
+            vertical-align: middle; /* 垂直居中，优化表单对齐 */
+        }
+        
+        input[type="text"] {
+            padding: 6px 10px;
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
+            font-size: 13px;
+            width: auto;
+            transition: border-color 0.2s;
+        }
+        
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #4285f4; /* 聚焦时高亮边框 */
+            box-shadow: 0 0 0 2px rgba(66, 133, 244, 0.1);
+        }
+        
+        input[type="text"][size="46"] {
+            width: 320px;
+            max-width: 100%;
+        }
+        
+        input[type="radio"], input[type="checkbox"] {
+            margin: 0 5px;
+            vertical-align: middle; /* 对齐单选/复选框 */
+            cursor: pointer;
+        }
+        
+        label {
+            font-size: 13px;
+            color: #374151;
+            cursor: pointer;
+            margin: 0 3px;
+        }
+        
+        input[type="button"] {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            background-color: #22c55e;
+            color: white;
+            font-size: 13px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        input[type="button"]:hover {
+            background-color: #16a34a;
+        }
+        
+        textarea {
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
+            font-size: 13px;
+            resize: vertical;
+            padding: 8px 10px;
+            transition: border-color 0.2s;
+        }
+        
+        textarea:focus {
+            outline: none;
+            border-color: #4285f4;
+            box-shadow: 0 0 0 2px rgba(66, 133, 244, 0.1);
+        }
+        
+        /* 移动端适配优化 */
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+                margin: 12px;
+            }
+            
+            input[type="text"][size="46"] {
+                width: 100%;
+            }
+            
+            .clock-calendar {
+                gap: 12px;
+            }
+            
+            .footer-links a {
+                margin: 0 6px 8px;
+                font-size: 12px;
+            }
+            
+            .table td {
+                padding: 8px 5px;
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 8px; /* 移动端表单元素换行后间距 */
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav>
+        <ul>
+            <li><a href="javascript:;" onclick="showPage('home')">主页</a></li> <!-- 补充javascript:;确保点击不跳转 -->
+            <li><a href="javascript:;" onclick="showPage('link-generator')">批量链接生成器</a></li>
+        </ul>
+    </nav>
+    
+    <!-- 主页内容 -->
+    <div id="home" class="page active">
+        <div class="container">
+            <h1>欢迎来到多功能网站</h1>
+            
+            <div class="clock-calendar">
+                <div class="clock-container">
+                    <h2>实时时钟</h2>
+                    <div id="clock">12:57:11</div>
+                    <div id="date">2025年09月16日 星期二</div>
+                </div>
+                
+                <div class="calendar-container">
+                    <h2>日历</h2>
+                    <div id="calendar">
+                        <table class="calendar">
+                            <tbody>
+                                <tr>
+                                    <<th>日</</th><<th>一</</th><<th>二</</th><<th>三</</th><<th>四</</th><<th>五</</th><<th>六</</th> <!-- 修复原代码中多余的<符号 -->
+                                </tr>
+                                <tr>
+                                    <td></td><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td>
+                                </tr>
+                                <tr>
+                                    <td>7</td><td>8</td><td>9</td><td>10</td><td>11</td><td>12</td><td>13</td>
+                                </tr>
+                                <tr>
+                                    <td>14</td><td>15</td><td><span class="today">16</span></td><td>17</td><td>18</td><td>19</td><td>20</td>
+                                </tr>
+                                <tr>
+                                    <td>21</td><td>22</td><td>23</td><td>24</td><td>25</td><td>26</td><td>27</td>
+                                </tr>
+                                <tr>
+                                    <td>28</td><td>29</td><td>30</td><td></td><td></td><td></td><td></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <div style="text-align: center; margin-top: 18px; color: #64748b; font-size: 14px;">
+                <p>主页包含实时时钟和日历功能，点击上方导航可切换至批量链接生成器工具</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 批量链接生成器页面 -->
+    <div id="link-generator" class="page">
+        <div class="container">
+            <h1>在线网址链接批量生成器</h1>
+            <div class="alert alert-success">
+                链接批量生成器可按指定格式批量生成链接地址，工具下方配有详细使用说明，操作简单易用
+            </div>
+            
+            <div style="margin-bottom: 8px; font-size:14px;">
+                <div id="main_content">
+                    <table border="0" align="center" cellpadding="0" cellspacing="0" class="table">
+                        <tbody>
+                            <tr>
+                                <td align="center">
+                                    <!-- 网址输入 -->
+                                    <label for="scq_url">网址</label>：
+                                    <input type="text" id="scq_url" size="46" value="http://www.a.com/(*).jpg"> 
+                                    <span style="color: #64748b; font-size: 12px;">变量用(*)号表示</span>
+                                    
+                                    <br><br>
+                                    
+                                    <!-- 等差数列选项 -->
+                                    <input name="scq_radio" type="radio" id="scq_dcsl" checked="checked"> 
+                                    <label for="scq_dcsl">等差数列</label>
+                                    <label for="scq_dcsl_sx">首项</label>：<input type="text" id="scq_dcsl_sx" size="5" value="1">
+                                    <label for="scq_dcsl_xs">项数</label>：<input type="text" id="scq_dcsl_xs" size="5" value="5">
+                                    <label for="scq_dcsl_gc">公差</label>：<input type="text" id="scq_dcsl_gc" size="5" value="1"> 
+                                    <input type="checkbox" id="scq_dcsl_bl"><label for="scq_dcsl_bl">补0</label>
+                                    <input type="checkbox" id="scq_dcsl_dx"><label for="scq_dcsl_dx">倒序</label>
+                                    
+                                    <br><br>
+                                    
+                                    <!-- 等比数列选项 -->
+                                    <input type="radio" name="scq_radio" id="scq_dbsl"> 
+                                    <label for="scq_dbsl">等比数列</label>
+                                    <label for="scq_dbsl_sx">首项</label>：<input type="text" id="scq_dbsl_sx" size="5" value="1">
+                                    <label for="scq_dbsl_xs">项数</label>：<input type="text" id="scq_dbsl_xs" size="5" value="5">
+                                    <label for="scq_dbsl_gc">公比</label>：<input type="text" id="scq_dbsl_gb" size="5" value="2"> 
+                                    <input type="checkbox" id="scq_dbsl_bl"><label for="scq_dbsl_bl">补0</label>
+                                    <input type="checkbox" id="scq_dbsl_dx"><label for="scq_dbsl_dx">倒序</label>
+                                    
+                                    <br><br>
+                                    
+                                    <!-- 字母变化选项 -->
+                                    <input type="radio" name="scq_radio" id="scq_zmbh"> 
+                                    <label for="scq_zmbh">字母变化</label>
+                                    <label for="scq_zmbh_c">从</label>：<input type="text" id="scq_zmbh_c" size="5" value="a">
+                                    <label for="scq_zmbh_d">到</label>：<input type="text" id="scq_zmbh_d" size="5" value="z">
+                                    <input type="checkbox" id="scq_zmbh_dx"><label for="scq_zmbh_dx">倒序</label>
+                                    
+                                    <br><br>
+                                    
+                                    <!-- 生成按钮 -->
+                                    <div align="center">
+                                        <input type="button" onclick="generateLinks()" value="生成" class="btn btn-success">
+                                    </div>
+                                    
+                                    <br>
+                                    
+                                    <!-- 结果输出 -->
+                                    <label for="scq_jieguo">结果：</label><br>
+                                    <textarea id="scq_jieguo" rows="20" class="form-control" onclick="this.focus();this.select()" style="width: 100%;"></textarea>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    
+                    <!-- 使用说明 -->
+                    <h2 align="center" class="alert alert-warning">链接地址批量生成器用法说明</h2>
+                    <div class="alert alert-info">
+                        <p>批量生成功能可创建多个含共同特征的链接，例如某网站的10个下载链接：</p>
+                        <p>http://www.a.com/01.zip、http://www.a.com/02.zip ... http://www.a.com/10.zip</p>
+                        <p>这些地址仅数字部分不同，用(*)表示变化部分，可写成：http://www.a.com/(*).zip</p>
+                        <p><strong>通配符长度说明</strong>：变化部分的数字位数，如01-10为2位，001-010为3位</p>
+                        <p><strong>注意</strong>：填写范围时（如01-10），设定通配符长度后，仅需输入1-10即可自动补位</p>
+                        <p><strong>应用场景</strong>：1. 百度站长后台批量提交文章链接；2. 批量生成目标网址用于抓取</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 底部链接区域（修复点击无响应，保留原地址） -->
+    <div class="footer-links">
+        <a data-tooltip="打开我的工具箱" onclick="openToolbox()">我的工具箱</a>
+        <a data-tooltip="点击显示邮箱地址" onclick="showEmail()">我的邮箱</a>
+        <a data-tooltip="访问我的微博" onclick="openWeibo()">我的微博</a>
+        <a data-tooltip="访问格式转换工具" onclick="openNav1()">格式转换</a>
+        <a data-tooltip="访问加密工具" onclick="openNav2()">加密工具</a>
+        <a data-tooltip="访问格式转换工具" onclick="openFormatTool()">格式转换工具</a>
+    </div>
+    
+    <div class="copyright">
+        Copyright © 2025 多功能网站 | 版权所有
+    </div>
+
+    <script>
+        // 页面切换功能（修复链接默认跳转行为）
+        function showPage(pageId) {
+            // 阻止a标签默认跳转（核心修复点）
+            event.preventDefault();
+            // 隐藏所有页面
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            // 显示选中页面
+            document.getElementById(pageId).classList.add('active');
+        }
+        
+        // 时钟功能（保留原逻辑）
+        function updateClock() {
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            
+            document.getElementById('clock').textContent = `${hours}:${minutes}:${seconds}`;
+            
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const weekdays = ['日', '一', '二', '三', '四', '五', '六'];
+            const weekday = weekdays[now.getDay()];
+            
+            document.getElementById('date').textContent = `${year}年${month}月${day}日 星期${weekday}`;
+            setTimeout(updateClock, 1000);
+        }
+        
+        // 日历功能（修复原代码中多余<符号导致的渲染异常）
+        function renderCalendar() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = now.getMonth();
+            
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            
+            const calendarEl = document.getElementById('calendar');
+            let calendarHTML = '<table class="calendar"><tr><<th>日</</th><<th>一</</th><<th>二</</th><<th>三</</th><<th>四</</th><<th>五</</th><<th>六</</th></tr><tr>';
+            
+            // 填充空白
+            for (let i = 0; i < firstDay; i++) {
+                calendarHTML += '<td></td>';
+            }
+            
+            // 填充日期
+            for (let day = 1; day <= daysInMonth; day++) {
+                const isToday = day === now.getDate() && month === now.getMonth() && year === now.getFullYear();
+                if (isToday) {
+                    calendarHTML += `<td><span class="today">${day}</span></td>`;
+                } else {
+                    calendarHTML += `<td>${day}</td>`;
+                }
+                // 换行
+                if ((firstDay + day) % 7 === 0) {
+                    calendarHTML += '</tr><tr>';
+                }
+            }
+            
+            calendarHTML += '</tr></table>';
+            calendarEl.innerHTML = calendarHTML;
+        }
+        
+        // 链接生成功能（保留原逻辑）
+        function generateLinks() {
+            const urlPattern = document.getElementById('scq_url').value;
+            let results = "";
+            
+            // 等差数列生成
+            if (document.getElementById('scq_dcsl').checked) {
+                const start = parseInt(document.getElementById('scq_dcsl_sx').value) || 1;
+                const count = parseInt(document.getElementById('scq_dcsl_xs').value) || 5;
+                const step = parseInt(document.getElementById('scq_dcsl_gc').value) || 1;
+                const padZero = document.getElementById('scq_dcsl_bl').checked;
+                const reverse = document.getElementById('scq_dcsl_dx').checked;
+                
+                let numbers = [];
+                for (let i = 0; i < count; i++) {
+                    numbers.push(start + i * step);
+                }
+                if (reverse) numbers.reverse();
+                
+                numbers.forEach(num => {
+                    const value = padZero ? String(num).padStart(2, '0') : num;
+                    results += urlPattern.replace('(*)', value) + '\n';
+                });
+            }
+            // 等比数列生成
+            else if (document.getElementById('scq_dbsl').checked) {
+                const start = parseInt(document.getElementById('scq_dbsl_sx').value) || 1;
+                const count = parseInt(document.getElementById('scq_dbsl_xs').value) || 5;
+                const ratio = parseInt(document.getElementById('scq_dbsl_gb').value) || 2;
+                const padZero = document.getElementById('scq_dbsl_bl').checked;
+                const reverse = document.getElementById('scq_dbsl_dx').checked;
+                
+                let numbers = [];
+                for (let i = 0; i < count; i++) {
+                    numbers.push(start * Math.pow(ratio, i));
+                }
+                if (reverse) numbers.reverse();
+                
+                numbers.forEach(num => {
+                    const value = padZero ? String(num).padStart(2, '0') : num;
+                    results += urlPattern.replace('(*)', value) + '\n';
+                });
+            }
+            // 字母变化生成
+            else if (document.getElementById('scq_zmbh').checked) {
+                const fromChar = document.getElementById('scq_zmbh_c').value.charCodeAt(0) || 97; // 默认a
+                const toChar = document.getElementById('scq_zmbh_d').value.charCodeAt(0) || 122; // 默认z
+                const reverse = document.getElementById('scq_zmbh_dx').checked;
+                
+                let chars = [];
+                const startChar = Math.min(fromChar, toChar);
+                const endChar = Math.max(fromChar, toChar);
+                for (let i = startChar; i <= endChar; i++) {
+                    chars.push(String.fromCharCode(i));
+                }
+                if (reverse) chars.reverse();
+                
+                chars.forEach(char => {
+                    results += urlPattern.replace('(*)', char) + '\n';
+                });
+            }
+            
+            document.getElementById('scq_jieguo').value = results;
+        }
+        
+        // 底部链接功能（修复点击无响应，严格保留原地址）
+        function showEmail() {
+            alert('我的邮箱地址是：gyjune@126.com');
+        }
+        
+        function openToolbox() {
+            // 保留原工具箱地址，未做修改
+            window.open('https://link3.cc/gyjune', '_blank');
+        }
+        
+        function openWeibo() {
+            // 保留原微博地址，未做修改
+            window.open('https://weibo.com/u/1771411553', '_blank');
+        }
+        
+        function openNav1() {
+            // 保留原格式转换地址，未做修改
+            window.open('./1.html', '_blank');
+        }
+        
+        function openNav2() {
+            // 保留原加密工具地址，未做修改
+            window.open('./2.html', '_blank');
+        }
+        
+        function openFormatTool() {
+            // 保留原格式转换工具地址，未做修改
+            window.open('./3.html', '_blank');
+        }
+        
+        // 初始化（确保页面加载完成后执行）
+        window.onload = function() {
+            updateClock();
+            renderCalendar();
+            // 为底部链接添加点击事件监听（双重保障，避免事件丢失）
+            document.querySelectorAll('.footer-links a').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    // 确保不触发默认跳转，仅执行自定义函数
+                    e.preventDefault();
+                    // 若链接有onclick属性，执行对应函数
+                    const onClickFunc = this.getAttribute('onclick');
+                    if (onClickFunc) {
+                        eval(onClickFunc); // 执行自定义函数（保留原逻辑）
+                    }
+                });
+            });
+        };
+    </script>
+</body>
+</html>
