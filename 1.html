@@ -563,7 +563,7 @@
                 
                 const extension = outputFormat === 'txt' ? '.txt' : '.m3u';
                 a.href = url;
-                a.download = `converted_file${extension}`;
+                a.download = `live${extension}`;
                 a.click();
                 
                 URL.revokeObjectURL(url);
