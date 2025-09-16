@@ -6,31 +6,46 @@
     <title>GitHub 资源加速工具</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: "Arial", "Microsoft YaHei", sans-serif; }
-        body { max-width: 800px; margin: 0 auto; padding: 20px; background: #f5f5f5; }
-        .container { background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        h1 { color: #24292e; margin-bottom: 20px; font-size: 24px; text-align: center; }
-        .desc { color: #666; margin-bottom: 25px; line-height: 1.6; }
+        body { max-width: 800px; margin: 0 auto; padding: 20px; background: #f0f2f5; }
+        .container { background: #fff; padding: 30px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .header { text-align: center; margin-bottom: 25px; }
+        h1 { color: #24292e; margin-bottom: 10px; font-size: 28px; }
+        .desc { color: #586069; margin-bottom: 25px; line-height: 1.6; font-size: 16px; }
         .input-group { display: flex; gap: 10px; margin-bottom: 20px; }
-        #githubUrl { flex: 1; padding: 12px 15px; border: 1px solid #ddd; border-radius: 4px; font-size: 16px; outline: none; }
-        #githubUrl:focus { border-color: #0366d6; box-shadow: 0 0 0 3px rgba(3,102,214,0.1); }
-        #加速按钮 { padding: 12px 25px; background: #0366d6; color: #fff; border: none; border-radius: 4px; font-size: 16px; cursor: pointer; }
-        #加速按钮:hover { background: #0256b3; }
+        #githubUrl { flex: 1; padding: 14px 16px; border: 1px solid #ddd; border-radius: 6px; font-size: 16px; outline: none; transition: all 0.3s; }
+        #githubUrl:focus { border-color: #0366d6; box-shadow: 0 0 0 3px rgba(3,102,214,0.2); }
+        #accelerateBtn { padding: 14px 28px; background: #0366d6; color: #fff; border: none; border-radius: 6px; font-size: 16px; cursor: pointer; transition: all 0.3s; font-weight: 500; }
+        #accelerateBtn:hover { background: #0256b3; transform: translateY(-1px); }
+        #accelerateBtn:active { transform: translateY(0); }
         .supported { margin-top: 30px; }
-        h3 { color: #24292e; margin: 15px 0 8px; font-size: 18px; }
-        ul { color: #666; padding-left: 20px; line-height: 1.6; }
-        .result { margin-top: 20px; padding: 15px; border-radius: 4px; display: none; }
-        .success { background: #e6ffed; border: 1px solid #a3e6b1; }
-        .error { background: #ffebe9; border: 1px solid #ffcecc; }
-        #resultText { color: #24292e; line-height: 1.6; }
-        #copyBtn { margin-top: 10px; padding: 8px 15px; background: #f5f5f5; border: 1px solid #ddd; border-radius: 4px; cursor: pointer; }
+        h3 { color: #24292e; margin: 18px 0 10px; font-size: 18px; }
+        ul { color: #586069; padding-left: 22px; line-height: 1.7; }
+        ul li { margin-bottom: 8px; }
+        .result { margin-top: 20px; padding: 18px; border-radius: 6px; display: none; }
+        .success { background: #f0fff4; border: 1px solid #c6f6d5; }
+        .error { background: #fff5f5; border: 1px solid #fed7d7; }
+        #resultText { color: #24292e; line-height: 1.6; font-size: 16px; }
+        #copyBtn { margin-top: 12px; padding: 10px 18px; background: #f6f8fa; color: #0366d6; border: 1px solid #d1d9e0; border-radius: 6px; cursor: pointer; font-size: 14px; transition: all 0.2s; }
+        #copyBtn:hover { background: #e4eaf0; }
+        .loading { display: inline-block; width: 18px; height: 18px; border: 2px solid rgba(255,255,255,.3); border-radius: 50%; border-top-color: #fff; animation: spin 1s ease-in-out infinite; margin-right: 8px; vertical-align: middle; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .proxy-info { background: #f6f8fa; padding: 15px; border-radius: 6px; margin-top: 20px; border-left: 4px solid #0366d6; }
+        .proxy-info p { margin: 5px 0; color: #586069; }
+        .examples { margin-top: 25px; }
+        .example-list { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 10px; }
+        .example-card { background: #f6f8fa; padding: 12px; border-radius: 6px; font-size: 14px; cursor: pointer; transition: all 0.2s; border: 1px solid #e1e4e8; }
+        .example-card:hover { background: #e1e4e8; }
+        footer { text-align: center; margin-top: 30px; color: #6a737d; font-size: 14px; }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>GitHub 资源加速工具</h1>
-        <p class="desc">
-            输入 GitHub 相关链接（如 Releases、Blob、Raw 文件等），点击加速按钮生成代理链接，解决国内访问缓慢问题。
-        </p>
+        <div class="header">
+            <h1>GitHub 资源加速工具</h1>
+            <p class="desc">
+                输入 GitHub 相关链接，一键生成代理链接，解决国内访问缓慢问题。使用自定义代理服务：<strong>www.gyj07.dpdns.org</strong>
+            </p>
+        </div>
 
         <!-- 输入和按钮区域 -->
         <div class="input-group">
@@ -39,13 +54,27 @@
                 id="githubUrl" 
                 placeholder="示例：https://github.com/用户名/仓库名/releases 或 https://raw.githubusercontent.com/..."
             >
-            <button id="加速按钮">生成加速链接</button>
+            <button id="accelerateBtn">
+                <span id="btnLoading" class="loading" style="display: none;"></span>
+                <span id="btnText">生成加速链接</span>
+            </button>
         </div>
 
         <!-- 结果显示区域 -->
         <div class="result" id="resultBox">
             <p id="resultText"></p>
             <button id="copyBtn">复制加速链接</button>
+        </div>
+
+        <!-- 示例链接 -->
+        <div class="examples">
+            <h3>🚀 快速示例（点击试试）</h3>
+            <div class="example-list">
+                <div class="example-card" data-url="https://github.com/rustdesk/rustdesk/releases/latest">RustDesk Releases</div>
+                <div class="example-card" data-url="https://raw.githubusercontent.com/octocat/Hello-World/master/README">Raw 文件示例</div>
+                <div class="example-card" data-url="https://github.com/torvalds/linux/blob/master/README">Linux 源码页面</div>
+                <div class="example-card" data-url="https://github.com/nodejs/node/tags">Node.js Tags</div>
+            </div>
         </div>
 
         <!-- 支持的链接类型说明 -->
@@ -57,29 +86,44 @@
                 <li>Raw 原始文件：https://raw.githubusercontent.com/用户名/仓库名/分支/文件路径</li>
                 <li>Gist 代码片段：https://gist.github.com/用户名/ID 或 https://gist.githubusercontent.com/...</li>
                 <li>仓库 Tags 页面：https://github.com/用户名/仓库名/tags</li>
+                <li>仓库压缩包下载：https://github.com/用户名/仓库名/archive/分支.zip</li>
             </ul>
+
+            <div class="proxy-info">
+                <p><strong>代理服务信息</strong></p>
+                <p>当前使用代理：<code>www.gyj07.dpdns.org</code></p>
+                <p>代理类型：GitHub 资源加速代理</p>
+            </div>
 
             <h3>⚠️ 使用说明</h3>
             <ul>
                 <li>生成的加速链接可直接复制到浏览器地址栏访问，或用于下载工具（如 wget、curl）</li>
                 <li>若链接无法访问，可检查原链接是否有效（非 GitHub 链接不支持加速）</li>
+                <li>本工具仅提供链接转换服务，不存储任何用户数据</li>
             </ul>
         </div>
+
+        <footer>
+            <p>GitHub 资源加速工具 &copy; 2023 | 使用代理服务: www.gyj07.dpdns.org</p>
+        </footer>
     </div>
 
     <script>
-        // 配置（与原代理逻辑一致）
-        const PROXY_PREFIX = 'https://hunshcn.github.io/gh-proxy/'; // 代理前缀
+        // 配置
+        const PROXY_PREFIX = 'https://www.gyj07.dpdns.org/'; // 使用指定的代理域名
         const Config = { jsdelivr: 0 }; // 0=关闭jsDelivr镜像，1=开启
 
         // DOM 元素
         const githubUrlInput = document.getElementById('githubUrl');
-        const加速Btn = document.getElementById('加速按钮');
+        const accelerateBtn = document.getElementById('accelerateBtn');
+        const btnText = document.getElementById('btnText');
+        const btnLoading = document.getElementById('btnLoading');
         const resultBox = document.getElementById('resultBox');
         const resultText = document.getElementById('resultText');
         const copyBtn = document.getElementById('copyBtn');
+        const exampleCards = document.querySelectorAll('.example-card');
 
-        // 检查链接是否符合 GitHub 支持类型（原逻辑正则）
+        // 检查链接是否符合 GitHub 支持类型
         function checkGithubUrl(url) {
             const exps = [
                 /^(?:https?:\/\/)?github\.com\/.+?\/.+?\/(?:releases|archive)\/.*$/i,
@@ -87,7 +131,8 @@
                 /^(?:https?:\/\/)?github\.com\/.+?\/.+?\/(?:info|git-).*$/i,
                 /^(?:https?:\/\/)?raw\.(?:githubusercontent|github)\.com\/.+?\/.+?\/.+?\/.+$/i,
                 /^(?:https?:\/\/)?gist\.(?:githubusercontent|github)\.com\/.+?\/.+?\/.+$/i,
-                /^(?:https?:\/\/)?github\.com\/.+?\/.+?\/tags.*$/i
+                /^(?:https?:\/\/)?github\.com\/.+?\/.+?\/tags.*$/i,
+                /^(?:https?:\/\/)?github\.com\/.+?\/.+?\/archive\/.*$/i
             ];
             return exps.some(exp => exp.test(url));
         }
@@ -95,6 +140,12 @@
         // 生成加速链接（核心逻辑）
         function generateProxyUrl(originalUrl) {
             let url = originalUrl.trim();
+            
+            // 确保URL有协议头
+            if (!url.startsWith('http')) {
+                url = 'https://' + url;
+            }
+            
             // 处理 Blob 链接（根据 jsdelivr 配置）
             if (url.match(/^(?:https?:\/\/)?github\.com\/.+?\/.+?\/blob\/.*$/i)) {
                 if (Config.jsdelivr) {
@@ -105,53 +156,120 @@
                     url = url.replace('/blob/', '/raw/');
                 }
             }
+            
+            // 处理Gist原始文件链接
+            if (url.includes('gist.githubusercontent.com')) {
+                return PROXY_PREFIX + url;
+            }
+            
             // 其他类型链接直接拼接代理前缀
             return PROXY_PREFIX + url;
         }
-
-        // 加速按钮点击事件
-        加速Btn.addEventListener('click', () => {
-            const originalUrl = githubUrlInput.value.trim();
-            // 验证输入
-            if (!originalUrl) {
-                showResult('请输入 GitHub 相关链接', 'error');
-                return;
-            }
-            if (!checkGithubUrl(originalUrl)) {
-                showResult('不支持的链接类型！请输入 GitHub Releases/Blob/Raw/Gist 链接', 'error');
-                return;
-            }
-            // 生成并显示加速链接
-            const proxyUrl = generateProxyUrl(originalUrl);
-            showResult(`加速链接已生成：<br><br><strong>${proxyUrl}</strong>`, 'success');
-            // 存储链接用于复制
-            copyBtn.dataset.url = proxyUrl;
-        });
-
-        // 复制按钮点击事件
-        copyBtn.addEventListener('click', () => {
-            const proxyUrl = copyBtn.dataset.url;
-            if (proxyUrl) {
-                navigator.clipboard.writeText(proxyUrl).then(() => {
-                    alert('加速链接已复制到剪贴板！');
-                }).catch(() => {
-                    alert('复制失败，请手动复制链接');
-                });
-            }
-        });
 
         // 显示结果（成功/错误）
         function showResult(text, type) {
             resultText.innerHTML = text;
             resultBox.className = `result ${type}`;
             resultBox.style.display = 'block';
+            
+            // 自动滚动到结果区域
+            resultBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
+
+        // 设置按钮加载状态
+        function setLoadingState(isLoading) {
+            if (isLoading) {
+                accelerateBtn.disabled = true;
+                btnText.textContent = '处理中...';
+                btnLoading.style.display = 'inline-block';
+            } else {
+                accelerateBtn.disabled = false;
+                btnText.textContent = '生成加速链接';
+                btnLoading.style.display = 'none';
+            }
+        }
+
+        // 处理加速功能
+        function accelerateUrl() {
+            const originalUrl = githubUrlInput.value.trim();
+            
+            // 验证输入
+            if (!originalUrl) {
+                showResult('请输入 GitHub 相关链接', 'error');
+                return;
+            }
+            
+            if (!checkGithubUrl(originalUrl)) {
+                showResult('不支持的链接类型！请输入 GitHub Releases/Blob/Raw/Gist 链接', 'error');
+                return;
+            }
+            
+            // 显示加载状态
+            setLoadingState(true);
+            
+            // 使用setTimeout模拟异步处理
+            setTimeout(() => {
+                // 生成并显示加速链接
+                const proxyUrl = generateProxyUrl(originalUrl);
+                showResult(`加速链接已生成：<br><br><a href="${proxyUrl}" target="_blank" style="word-break: break-all; color: #0366d6; text-decoration: none;">${proxyUrl}</a><br><br>点击链接测试或复制到下载工具中使用`, 'success');
+                
+                // 存储链接用于复制
+                copyBtn.dataset.url = proxyUrl;
+                
+                // 移除加载状态
+                setLoadingState(false);
+            }, 500);
+        }
+
+        // 加速按钮点击事件
+        accelerateBtn.addEventListener('click', accelerateUrl);
+
+        // 复制按钮点击事件
+        copyBtn.addEventListener('click', () => {
+            const proxyUrl = copyBtn.dataset.url;
+            if (proxyUrl) {
+                // 创建一个临时textarea元素来复制文本
+                const textarea = document.createElement('textarea');
+                textarea.value = proxyUrl;
+                document.body.appendChild(textarea);
+                textarea.select();
+                
+                try {
+                    const successful = document.execCommand('copy');
+                    const msg = successful ? '成功复制到剪贴板！' : '复制失败，请手动复制链接';
+                    alert(msg);
+                } catch (err) {
+                    alert('复制失败，请手动复制链接');
+                }
+                
+                document.body.removeChild(textarea);
+            }
+        });
+
+        // 示例卡片点击事件
+        exampleCards.forEach(card => {
+            card.addEventListener('click', () => {
+                githubUrlInput.value = card.dataset.url;
+                accelerateUrl();
+            });
+        });
 
         // 回车键触发加速
         githubUrlInput.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
-                加速Btn.click();
+                accelerateUrl();
             }
+        });
+
+        // 页面加载后自动聚焦到输入框
+        window.addEventListener('load', () => {
+            githubUrlInput.focus();
+            
+            // 显示欢迎信息
+            showResult('欢迎使用 GitHub 资源加速工具！请输入 GitHub 链接并点击"生成加速链接"按钮。', 'success');
+            setTimeout(() => {
+                resultBox.style.display = 'none';
+            }, 4000);
         });
     </script>
 </body>
