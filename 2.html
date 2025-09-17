@@ -2,133 +2,27 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>TVBox AES-128-CBC 工具</title>
 <script src="https://cdn.jsdelivr.net/npm/crypto-js@4.2.0/crypto-js.min.js"></script>
 <style>
-/* ========= 统一 index 极简风 ========= */
 *{box-sizing:border-box}
-body{
-    font-family:"Microsoft YaHei",Roboto,"Helvetica Neue",Arial,sans-serif;
-    background:#f9fafb;
-    color:#374151;
-    margin:0;
-    min-height:100vh;
-    display:flex;
-    flex-direction:column;
-    line-height:1.5
-}
-.container{
-    width:100%;
-    max-width:600px;
-    margin:0 auto 24px;   /* 顶部导航已固定，去掉上边距 */
-    padding:16px;
-    background:#fff;
-    border-radius:0 0 10px 10px; /* 顶部导航已圆角，内容区只保留底部圆角 */
-    box-shadow:0 0 6px rgba(0,0,0,.04);
-    flex:1
-}
-h2{
-    font-size:18px;
-    text-align:center;
-    margin:0 0 16px;
-    color:#4b5563
-}
-label{font-size:14px;color:#374151;margin-bottom:6px;display:block}
-input[type=text],textarea{
-    width:100%;
-    border:1px solid #d1d5db;
-    border-radius:6px;
-    padding:10px 12px;
-    font-size:15px;
-    resize:none;
-    transition:border-color .2s,box-shadow .2s
-}
-input[type=text]:focus,textarea:focus{
-    outline:none;
-    border-color:#4285f4;
-    box-shadow:0 0 0 2px rgba(66,133,244,.15)
-}
+body{margin:0;font:14px/1.5 "Microsoft YaHei";background:#f9fafb;color:#374151;display:flex;flex-direction:column;min-height:100vh}
+.top-nav,.footer-links{background:#4285f4;text-align:center;padding:10px 0;font-size:0}
+.top-nav a,.footer-links a{color:#fff;font-size:13px;margin:0 8px;padding:4px 6px;text-decoration:none}
+.top-nav a:hover,.footer-links a:hover{text-decoration:underline}
+.container{width:100%;max-width:600px;margin:0 auto 24px;padding:16px;background:#fff;border-radius:0 0 8px 8px;box-shadow:0 0 6px rgba(0,0,0,.04);flex:1}
+h2{font-size:18px;text-align:center;margin:0 0 16px}
+label{font-size:14px;margin-bottom:6px;display:block}
+input[type=text],textarea{width:100%;padding:10px 12px;border:1px solid #d1d5db;border-radius:6px;font-size:15px;resize:none}
 textarea{min-height:140px}
-input[type=file]{display:none}
-
-.btn-grid{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(90px,1fr));
-    gap:8px;
-    margin:14px 0
-}
-button,.upload-btn{
-    border:none;
-    border-radius:6px;
-    padding:12px 0;
-    font-size:15px;
-    font-weight:600;
-    color:#fff;
-    cursor:pointer;
-    transition:filter .2s
-}
+.btn-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(90px,1fr));gap:8px;margin:14px 0}
+button,.upload-btn{border:none;border-radius:6px;padding:12px 0;font-size:15px;font-weight:600;color:#fff;cursor:pointer;transition:filter .2s}
 button:hover,.upload-btn:hover{filter:brightness(1.1)}
-.enc{background:#f093fb}
-.dec{background:#06d6a0}
-.copy{background:#f7b801}
-.clear{background:#ef476f}
-.down{background:#4895ef}
-.upload-btn{background:#4285f4;grid-column:1/-1}
-
-/* ===== 顶部导航 ===== */
-.top-nav{
-    background:#4285f4;
-    text-align:center;
-    padding:12px 8px;
-    font-size:0
-}
-.top-nav a{
-    color:#fff;
-    font-size:13px;
-    margin:0 8px;
-    display:inline-block;
-    padding:4px 6px;
-    cursor:pointer;
-    text-decoration:none
-}
-.top-nav a:hover{text-decoration:underline}
-
-.footer-links{
-    background:#4285f4;
-    text-align:center;
-    padding:12px 8px;
-    margin-top:auto;
-    font-size:0
-}
-.footer-links a{
-    color:#fff;
-    font-size:13px;
-    margin:0 8px;
-    display:inline-block;
-    padding:4px 6px;
-    cursor:pointer;
-    text-decoration:none
-}
-.footer-links a:hover{text-decoration:underline}
-.copyright{
-    background:#f8fafc;
-    font-size:12px;
-    color:#64748b;
-    text-align:center;
-    padding:10px 0;
-    border-top:1px solid #f0f0f0
-}
-
-@media(max-width:600px){
-    .container{padding:12px;margin:0 auto 16px}   /* 移动端保持底部间距 */
-    h2{font-size:16px;margin-bottom:12px}
-    input[type=text],textarea{font-size:14px;padding:8px 10px}
-    .btn-grid{grid-template-columns:repeat(2,1fr);gap:6px}
-    button,.upload-btn{font-size:14px;padding:10px 0}
-    .footer-links a{font-size:12px;margin:0 6px}
-    .top-nav a{font-size:12px;margin:0 6px}
-}
+.enc{background:#f093fb}.dec{background:#06d6a0}.copy{background:#f7b801}.clear{background:#ef476f}.down{background:#4895ef}
+.upload-btn{background:#4285f4;grid-column:1/-1}input[type=file]{display:none}
+.copyright{background:#f8fafc;font-size:12px;color:#64748b;text-align:center;padding:10px 0;border-top:1px solid #f0f0f0}
+@media(max-width:600px){.btn-grid{grid-template-columns:repeat(2,1fr)}}
 </style>
 </head>
 <body>
@@ -149,10 +43,10 @@ button:hover,.upload-btn:hover{filter:brightness(1.1)}
 
     <div class="btn-grid">
         <button class="enc" id="btnEnc">加密</button>
-        <button class="down" id="btnDown">下载</button>
         <button class="dec" id="btnDec">解密</button>
         <button class="copy" id="btnCopy">复制</button>
         <button class="clear" id="btnClear">清除</button>
+        <button class="down" id="btnDown">下载</button>
     </div>
     <label for="upload" class="upload-btn">📤 上传文件</label>
     <input type="file" id="upload" accept="text/plain"/>
@@ -166,23 +60,23 @@ button:hover,.upload-btn:hover{filter:brightness(1.1)}
 
 <!-- 底部链接 -->
 <div class="footer-links">
-    <a data-tooltip="打开我的工具箱" onclick="openToolbox()">我的工具箱</a>
-    <a data-tooltip="点击显示邮箱地址" onclick="showEmail()">我的邮箱</a>
-    <a data-tooltip="访问我的微博" onclick="openWeibo()">我的微博</a>
-    <a data-tooltip="访问格式转换工具" onclick="openNav1()">格式转换</a>
-    <a data-tooltip="访问加密工具" onclick="openNav2()">加密工具</a>
-    <a data-tooltip="访问格式转换工具" onclick="openFormatTool()">格式转换工具</a>
+    <a onclick="window.open('https://link3.cc/gyjune')">我的工具箱</a>
+    <a onclick="alert('邮箱：gyjune@126.com')">我的邮箱</a>
+    <a onclick="window.open('https://weibo.com/u/1771411553')">我的微博</a>
+    <a href="./1.html">格式转换</a>
+    <a href="./2.html">加密工具</a>
+    <a href="./3.html">格式转换工具</a>
 </div>
 <div class="copyright">Copyright © 2025 多功能网站 | 版权所有</div>
 
 <script>
-/* ---------- 工具函数 ---------- */
+/* ---------- 基础工具 ---------- */
 const pad16 = str => {
     const buf = CryptoJS.enc.Utf8.parse(str);
-    const len = 16 - buf.sigBytes % 16;
+    const len = 16 - (buf.sigBytes % 16 || 16);
     return buf.concat(CryptoJS.lib.WordArray.random(len));
 };
-const toHex  = wa => wa.toString(CryptoJS.enc.Hex);
+const toHex = wa => wa.toString(CryptoJS.enc.Hex);
 const fromHex = hex => CryptoJS.enc.Hex.parse(hex);
 let lastCipher = '';
 
@@ -192,21 +86,10 @@ document.getElementById('btnEnc').onclick = () => {
     const key = pad16(keyStr);
     const iv  = CryptoJS.lib.WordArray.random(16);
     const plain = CryptoJS.enc.Utf8.parse(document.getElementById('in').value);
-
     const c = CryptoJS.AES.encrypt(plain, key, {iv, mode:CryptoJS.mode.CBC, padding:CryptoJS.pad.Pkcs7});
     const keyHex = toHex(CryptoJS.enc.Utf8.parse('$#' + keyStr + '#$'));
     lastCipher = keyHex + c.ciphertext.toString() + toHex(iv);
     document.getElementById('out').value = lastCipher;
-};
-
-/* ---------- 下载 ---------- */
-document.getElementById('btnDown').onclick = () => {
-    if (!lastCipher) return alert('请先加密！');
-    const blob = new Blob([lastCipher], {type:'text/plain'});
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = 'jk.txt';
-    a.click();
 };
 
 /* ---------- 解密 ---------- */
@@ -223,6 +106,15 @@ document.getElementById('btnDec').onclick = () => {
     const plain = d.toString(CryptoJS.enc.Utf8);
     if (!plain) return alert('解密失败，检查密钥或密文');
     document.getElementById('out').value = plain;
+};
+
+/* ---------- 下载 ---------- */
+document.getElementById('btnDown').onclick = () => {
+    if (!lastCipher) return alert('请先加密！');
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([lastCipher], {type:'text/plain'}));
+    a.download = 'jk.txt';
+    a.click();
 };
 
 /* ---------- 复制 ---------- */
@@ -247,25 +139,10 @@ document.getElementById('upload').addEventListener('change', e => {
     if (!file) return;
     const reader = new FileReader();
     reader.onload = () => {
-        const txt = reader.result;
-        document.getElementById('in').value = txt;
-        if (/^[0-9a-fA-F]+$/.test(txt.trim()) && txt.includes('$#')) {
-            const m = txt.match(/\$#([0-9a-fA-F]+)#\$/);
-            if (m) try {
-                document.getElementById('key').value = CryptoJS.enc.Utf8.stringify(CryptoJS.enc.Hex.parse(m[1]));
-            } catch {}
-        }
+        document.getElementById('in').value = reader.result;
     };
     reader.readAsText(file);
-};
-
-/* ---------- 底部链接功能 ---------- */
-function showEmail() {confirm('我的邮箱地址是：gyjune@126.com')}
-function openToolbox() {window.open('https://link3.cc/gyjune', '_blank')}
-function openWeibo() {window.open('https://weibo.com/u/1771411553', '_blank')}
-function openNav1() {window.open('./1.html', '_blank')}
-function openNav2() {window.open('./2.html', '_blank')}
-function openFormatTool() {window.open('./3.html', '_blank')}
+});
 </script>
 </body>
 </html>
