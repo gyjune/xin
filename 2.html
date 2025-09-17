@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>TVBox AES-128-CBC 工具</title>
+<title>TVBox AES-128-CBC 加密工具</title>
 <script src="https://cdn.jsdelivr.net/npm/crypto-js@4.2.0/crypto-js.min.js"></script>
 <style>
 *{box-sizing:border-box}
@@ -19,7 +19,7 @@ textarea{min-height:140px}
 .btn-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(90px,1fr));gap:8px;margin:14px 0}
 button,.upload-btn{border:none;border-radius:6px;padding:12px 0;font-size:15px;font-weight:600;color:#fff;cursor:pointer;transition:filter .2s}
 button:hover,.upload-btn:hover{filter:brightness(1.1)}
-.enc{background:#f093fb}.dec{background:#06d6a0}.copy{background:#f7b801}.clear{background:#ef476f}.down{background:#4895ef}
+.enc{background:#f093fb}.copy{background:#f7b801}.clear{background:#ef476f}.down{background:#4895ef}
 .upload-btn{background:#4285f4;grid-column:1/-1}input[type=file]{display:none}
 .copyright{background:#f8fafc;font-size:12px;color:#64748b;text-align:center;padding:10px 0;border-top:1px solid #f0f0f0}
 @media(max-width:600px){.btn-grid{grid-template-columns:repeat(2,1fr)}}
@@ -36,14 +36,13 @@ button:hover,.upload-btn:hover{filter:brightness(1.1)}
 </div>
 
 <div class="container">
-    <h2>TVBox AES-128-CBC 工具</h2>
+    <h2>TVBox AES-128-CBC 加密工具</h2>
 
     <label>密钥 Key</label>
     <input type="text" id="key" placeholder="任意长度，不足16位自动补0" value="123456"/>
 
     <div class="btn-grid">
         <button class="enc" id="btnEnc">加密</button>
-        <button class="dec" id="btnDec">解密</button>
         <button class="copy" id="btnCopy">复制</button>
         <button class="clear" id="btnClear">清除</button>
         <button class="down" id="btnDown">下载</button>
@@ -51,7 +50,7 @@ button:hover,.upload-btn:hover{filter:brightness(1.1)}
     <label for="upload" class="upload-btn">📤 上传文件</label>
     <input type="file" id="upload" accept="text/plain"/>
 
-    <label>输入（明文/密文）</label>
+    <label>输入（明文）</label>
     <textarea id="in" placeholder="粘贴或上传文件"></textarea>
 
     <label>输出结果</label>
@@ -77,7 +76,6 @@ const pad16 = str => {
     return buf.concat(CryptoJS.lib.WordArray.random(len));
 };
 const toHex = wa => wa.toString(CryptoJS.enc.Hex);
-const fromHex = hex => CryptoJS.enc.Hex.parse(hex);
 let lastCipher = '';
 
 /* ---------- 加密 ---------- */
@@ -90,22 +88,6 @@ document.getElementById('btnEnc').onclick = () => {
     const keyHex = toHex(CryptoJS.enc.Utf8.parse('$#' + keyStr + '#$'));
     lastCipher = keyHex + c.ciphertext.toString() + toHex(iv);
     document.getElementById('out').value = lastCipher;
-};
-
-/* ---------- 解密 ---------- */
-document.getElementById('btnDec').onclick = () => {
-    const data = document.getElementById('in').value.trim();
-    if (!data) return alert('请输入或上传密文');
-    const p1 = data.indexOf('$#'), p2 = data.indexOf('#$');
-    if (p1 === -1 || p2 === -1) return alert('格式错误：缺少$#...#$');
-    const keyHex = data.slice(p1 + 4, p2);
-    const keyStr = CryptoJS.enc.Utf8.stringify(CryptoJS.enc.Hex.parse(keyHex));
-    const iv   = fromHex(data.slice(-32));
-    const cipher = fromHex(data.slice(p2 + 4, -32));
-    const d = CryptoJS.AES.decrypt({ciphertext:cipher}, pad16(keyStr), {iv, mode:CryptoJS.mode.CBC, padding:CryptoJS.pad.Pkcs7});
-    const plain = d.toString(CryptoJS.enc.Utf8);
-    if (!plain) return alert('解密失败，检查密钥或密文');
-    document.getElementById('out').value = plain;
 };
 
 /* ---------- 下载 ---------- */
