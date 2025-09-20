@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>Base64 & GZIP 加解密工具 - 纯静态版</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+/* 样式与之前相同，精简放一块 */
+*{box-sizing:border-box;margin:0;padding:0;font-family:"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif}
+body{background:linear-gradient(135deg,#6a11cb 0%,#2575fc 100%);color:#333;min-height:100vh;padding:20px}
+.box{max-width:1000px;margin:0 auto;background:rgba(255,255,255,.95);border-radius:12px;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,.2)}
+header{background:linear-gradient(90deg,#4b6cb7 0%,#182848 100%);color:#fff;text-align:center;padding:25px 20px}
+h1{font-size:2rem;margin-bottom:8px}.sub{font-size:1.1rem;opacity:.9}
+.wrap{display:flex;flex-wrap:wrap;padding:20px;gap:20px}
+.panel{flex:1 1 320px;background:#fff;border-radius:8px;padding:20px;box-shadow:0 4px 10px rgba(0,0,0,.08)}
+h2{color:#4b6cb7;margin-bottom:12px;border-bottom:2px solid #eaeaea;padding-bottom:8px}
+textarea{width:100%;min-height:160px;padding:12px;border:1px solid #ccc;border-radius:6px;resize:vertical;font-family:monospace;font-size:14px;margin-bottom:12px}
+.btn-group{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+button{flex:1;padding:10px 16px;border:none;border-radius:6px;background:#4b6cb7;color:#fff;font-weight:600;cursor:pointer;transition:.25s;min-width:120px}
+button:hover{background:#3a559d;transform:translateY(-2px)}
+.success{background:#28a745}.info{background:#17a2b8}.orange{background:#fd7e14}
+.file-input{display:none}
+.file-label{background:#6a11cb;color:#fff;padding:10px 16px;border-radius:6px;cursor:pointer;display:inline-block;margin-bottom:10px}
+.file-label:hover{background:#5a0db5}
+.result{background:#f8f9fa;border:1px solid #eaeaea;border-radius:6px;padding:12px;margin-top:10px}
+.result-title{font-weight:600;margin-bottom:6px;color:#495057}
+.result-body{white-space:pre-wrap;word-break:break-all;font-family:monospace;font-size:14px;max-height:300px;overflow-y:auto}
+.examples{margin-top:15px}.item{background:#e9ecef;padding:8px 10px;border-radius:4px;margin-bottom:6px;cursor:pointer;font-size:14px}.item:hover{background:#dee2e6}
+.tips{padding:20px;background:#f8f9fa;border-top:1px solid #eaeaea}
+.tips h3{color:#4b6cb7;margin-bottom:8px}
+.tips ul{padding-left:20px;margin-bottom:10px}
+footer{text-align:center;padding:18px;color:#fff;background:linear-gradient(90deg,#4b6cb7 0%,#182848 100%);font-size:.9rem}
+@media(max-width:768px){.wrap{flex-direction:column}}
+</style>
+</head>
+<body>
+<div class="box">
+    <header>
+        <h1>Base64 & GZIP 加解密工具</h1>
+        <p class="sub">纯静态版 · 支持文件上传/下载/复制 · 全中文</p>
+    </header>
+
+    <div class="wrap">
+        <!-- 左侧：输入 -->
+        <div class="panel">
+            <h2>输入区</h2>
+            <label for="上传文件" class="file-label">📁 选择文件上传</label>
+            <input type="file" id="上传文件" class="file-input">
+            <div style="font-size:12px;color:#666;margin-bottom:10px">支持任意文本文件</div>
+            <textarea id="输入框" placeholder="请粘贴或上传内容…"></textarea>
+
+            <div class="btn-group">
+                <button id="解密Btn">🔓 解密</button>
+                <button id="加密Btn">🔒 加密</button>
+            </div>
+
+            <div class="examples">
+                <h3>一键示例</h3>
+                <div class="item" data-val="H4sIAFv2dGYC/zVQ0VLCMBD8m3wn4oAEZ0THUuzQGR4EUwGHVq1ASvia3F34C5NL+pTdvc1mL5S1YBpBWevUGKQS1F2c1AKmFV524bCmJPkgIC/9OCCaNHg/YqRe4NwFhHfPOMjZJ1Wa4uTNasna0litQvrto8DTISCY1Xi+srb69AZ+W2/BzPnGtKIsJi82WO7DFH/q5MO9ousTp8TkWDZZE4meRNojrPNEiFd26t0dfgWs1a0Yp6VDtVndk8XGN+sJp/V/M/qzXVyWEVdqhl6geeGqgbDm1Q2/Xbu0+lHQ6ssb/gEHs/6laAEAAA==">飞速资源</div>
+                <div class="item" data-val="H4sIAAAAAAAAAG2S31bCMAzG36bPyR832A7CpjgEd/BCsQOGAxXFleLLLE33Fm5pe7zxar806Zcv6XB6BHlg+meJYgcBZyjOOigZhJk6b1mT09zXxyv9WvwXqHGmryOG2zn4Hng5xCGr5K3uvTEsNyDvMBgw8G/q+Zoo4KrvEYVZJVNLOBVofEA0Uh1Ox0naVBOtBvAtWlLdSHUSol6OSUzUD1VvQTS8r8qAaDfSw2VL2L3UiwvR8GBbY1ig3BDx2CqjmIB3IpIxitTZeZBVydu1qJzjZUw0W6k0J3rf0+dUwMRQsq/XlALvsxLJ30W7VXPXBvXjutF3+6ZOrox0GnkXUwdXSdIuY2yZx7LOTGDU3TOaOWyZU3ex8W8rjXETVOcXjPx2K1atnef4Bc80GfZ39SzDR/Pb0MI0f9LFxy+o48M1VAIAAA==">快看资源</div>
+                <div class="item" data-val="H4sIAAAAAAAAADVQW3LCMAy8jc/JYygknSllCqGUTPkoYAphEqCB4uD0Mrbk3KK2Yn95V9autMJpqeWJodhrOcNoyMzfJ1ZHHXEGGcf6xaFmu4Df3CEd75RMXR+OTtAfEOITfa8cgu4rdBKHbK//hdG7EhHVktSWCcU7nJIC4xzlnmpLqQSnaatvS/w0eBwYVg8TCabXvFk8eeL2GReBzDdWFAitHTTjAu41ebX+raMVQJoF0ub0pLzpdRLIpfCbWIF7kK5l+JfJf5jeDH1u7NbNR01pexkmE8ozuKqKbqHkm+mdTblU4pnhyt32H73g+qZ2AQAA">天空资源</div>
+            </div>
+        </div>
+
+        <!-- 右侧：结果 -->
+        <div class="panel">
+            <h2>结果区</h2>
+            <div class="result">
+                <div class="result-title">处理结果：</div>
+                <div class="result-body" id="结果文本"></div>
+            </div>
+            <div class="btn-group">
+                <button class="info" onclick="复制结果()">📋 复制结果</button>
+                <button class="orange" onclick="下载结果()">⬇ 下载文件</button>
+            </div>
+            <div class="result" style="margin-top:12px">
+                <div class="result-title">操作记录：</div>
+                <div class="result-body" id="操作记录">等待操作</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="tips">
+        <h3>使用说明</h3>
+        <ul>
+            <li>解密：Base64 解码 → GZIP 解压缩</li>
+            <li>加密：GZIP 压缩 → Base64 编码</li>
+            <li>可上传文本文件自动读入；可下载处理结果到本地</li>
+            <li>点击“复制结果”即可一键写入剪贴板</li>
+        </ul>
+    </div>
+
+    <footer>© Base64 & GZIP 加解密工具 - 纯静态中文版</footer>
+</div>
+
+<script>
+/* ========== 加解密核心 ========== */
+function 解密(str){
+    try{
+        const binary = atob(str);
+        const bytes  = new Uint8Array(binary.length);
+        for(let i=0;i<binary.length;i++) bytes[i]=binary.charCodeAt(i);
+        const gunzipped = pako.inflate(bytes,{to:'string'});
+        return gunzipped;
+    }catch(e){ return '解密失败：' + e.message; }
+}
+function 加密(str){
+    try{
+        const gzipped = pako.gzip(str);
+        return btoa(String.fromCharCode(...gzipped));
+    }catch(e){ return '加密失败：' + e.message; }
+}
+
+/* ========== 按钮事件 ========== */
+document.getElementById('解密Btn').onclick = () => {
+    const txt = document.getElementById('输入框').value.trim();
+    if(!txt) return alert('请输入待解密内容');
+    const res = 解密(txt);
+    document.getElementById('结果文本').textContent = res;
+    document.getElementById('操作记录').textContent = '执行：Base64 解码 → GZIP 解压缩';
+};
+document.getElementById('加密Btn').onclick = () => {
+    const txt = document.getElementById('输入框').value.trim();
+    if(!txt) return alert('请输入待加密内容');
+    const res = 加密(txt);
+    document.getElementById('结果文本').textContent = res;
+    document.getElementById('操作记录').textContent = '执行：GZIP 压缩 → Base64 编码';
+};
+
+/* ========== 示例填充 ========== */
+document.querySelectorAll('.item').forEach(el=>{
+    el.onclick = () => {
+        document.getElementById('输入框').value = el.dataset.val;
+    };
+});
+
+/* ========== 文件上传 ========== */
+document.getElementById('上传文件').addEventListener('change', e=>{
+    const file = e.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+        document.getElementById('输入框').value = ev.target.result;
+    };
+    reader.readAsText(file);
+});
+
+/* ========== 复制结果（兼容 HTTP） ========== */
+function 复制结果(){
+    const txt = document.getElementById('结果文本').textContent;
+    if(!txt) return alert('暂无内容可复制');
+    if(navigator.clipboard && window.isSecureContext){
+        navigator.clipboard.writeText(txt).then(()=>alert('已复制到剪贴板'));
+    }else{
+        const ta = document.createElement('textarea');
+        ta.value=txt; ta.style.position='fixed'; ta.style.opacity=0;
+        document.body.appendChild(ta); ta.select();
+        try{ document.execCommand('copy'); alert('已复制到剪贴板'); }catch(e){ alert('复制失败，请手动选中复制'); }
+        document.body.removeChild(ta);
+    }
+}
+
+/* ========== 下载结果 ========== */
+function 下载结果(){
+    const txt = document.getElementById('结果文本').textContent;
+    if(!txt) return alert('暂无内容可下载');
+    const blob = new Blob([txt],{type:'text/plain;charset=utf-8'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href=url; a.download='结果_'+Date.now()+'.txt'; a.click();
+    URL.revokeObjectURL(url);
+}
+</script>
+
+<!-- 引入 pako 做 gzip 压缩/解压缩 -->
+<script src="https://cdn.jsdelivr.net/npm/pako@2.1.0/dist/pako.min.js"></script>
+</body>
+</html>
